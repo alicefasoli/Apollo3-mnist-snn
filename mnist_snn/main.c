@@ -5,171 +5,142 @@
 #include "list.h"
 #include "mnist.h"
 
-#define NUM_LAYER 28
-#define NUM_NEURON 28
+#define INPUT_LAYER_NUM_X 28
+#define HIDDEN_LAYER_NUM_X 10
+#define OUTPUT_LAYER_NUM 10
 
-struct Neuron *neurons[NUM_LAYER][NUM_NEURON]; 
+#define N_TEST_IMAGE 15
 
-void printMatrix()
+struct Neuron *inputLayer[INPUT_LAYER_NUM_X][INPUT_LAYER_NUM_X];
+struct Neuron *exc_hiddenLayer[HIDDEN_LAYER_NUM_X][HIDDEN_LAYER_NUM_X];
+struct Neuron *inh_hiddenLayer[HIDDEN_LAYER_NUM_X][HIDDEN_LAYER_NUM_X];
+struct Neuron *outputLayer[OUTPUT_LAYER_NUM];
+
+void createNeuronsPerLayer(int n, struct Neuron* layer[n][n], int duration)
 {
-    for(int i=0; i < NUM_LAYER; i++){
-        for(int j = 0; j < NUM_NEURON; j++){
-            if(neurons[i][j] != NULL){
-                printf("\nLIF(%d/%d) : ", i, j);
-                printNeuron(neurons[i][j]);
-            }
-        }
-        printf("]\n");
-    }
-}
-
-struct Neuron* create_neurons(int x, int y)
-{
-    int layer, neuron;
-    for(layer = 0; layer < y; layer++){
-        for(neuron = 0; neuron < x; neuron++){
-            neurons[layer][neuron] = neuron_Create();
+    for(int y = 0; y < n; y++){
+        for(int x = 0; x < n; x++){
+            layer[y][x] = createNeuron();
+            initList(layer[y][x], duration);
         }
     }  
 }
 
-void freeNeurons()
+void printNeuronsLayer(int n, struct Neuron** layer)
 {
-    for(int i=0; i<NUM_LAYER; i++){
-        for(int j=0; j<NUM_NEURON; j++){
-            neuron_Destroy(neurons[i][j]);
+    for(int i = 0; i < n; i++){
+        printf("LIF %d : [", i);
+        printNeuron(layer[i]);
+        printf("]\n");
+    }  
+}
+
+void freeNeuronsPerLayer(int n, struct Neuron* layer[n][n])
+{
+    for(int y = 0; y < n; y++){
+        for(int x = 0; x < n; x++){
+            destroyNeuron(layer[y][x]);
+        }
+    }  
+}
+
+void freeNeuronsOutputLayer(int n, struct Neuron* layer[n])
+{
+    for(int y = 0; y < n; y++){
+        destroyNeuron(layer[y]);
+    }  
+}
+
+struct Neuron** propagateSignal(struct Neuron** layerFrom, struct Neuron** layerTo, int layerFromNum, int layerToNum, int duration)
+{
+    float* neurons_stimulus[layerToNum];
+    for(int i = 0; i < layerToNum; i++){
+        neurons_stimulus[i] = (float*) calloc(duration, sizeof(float));
+    }
+
+    for(int i = 0; i < layerToNum; i++){
+        for(int j = 0; j < layerFromNum; j++){
+            for(int t = 0; t < duration; t++){
+                neurons_stimulus[i][t] = neurons_stimulus[i][t] + layerFrom[j]->spike[i];
+            }
+        }
+    }
+
+    // Run spikes through layer
+    for(int i = 0; i < layerToNum; i++){
+        spikeGenerator(neurons_stimulus[i], duration, layerTo[i]);
+    }
+
+    return layerTo;
+}
+
+void printSpikesPerLayer(int n, struct Neuron** layer, int duration)
+{
+    // Print generated spikes for output layer
+    for(int j = 0; j < n; j++){
+        for(int i = 0; i < duration; i++){
+            if(layer[j]->spike[i] > 0.0){
+                printf("Neuron {%d} : Fire at time %d s with value [%2.3f]\n", j, i, layer[j]->spike[i]);
+            }
         }
     }
 }
 
 int main()
 {
-    int T = 20; // total time to simulate (msec)
-    float dt = 0.0125; // simulation timestep
+    int T = 2000; // total time to simulate (msec)
+    float dt = 1.25; // simulation timestep
     int time = (int)T/dt;
     
     load_mnist();
 
     // Print a mnist test image
     // for(int i=0; i < (28*28); i++){
-    //     printf("%1.1f ", test_image[0][i]);
+    //     // printf("%1.1f ", test_image[N_TEST_IMAGE][i]);
+    //     if(test_image[N_TEST_IMAGE][i] > 0.0){
+    //         printf("@ ");
+    //     }else{
+    //         printf("- ");
+    //     }
     //     if( (i+1) % 28 ==0 ) putchar('\n');
     // }
-    
-    int stride[2] = {4,2};
-    int stride_size = stride[0] + stride[1];
-    int len_x = 28;
-    int len_y = 28;
 
-    create_neurons(len_x, len_y);
-    // printMatrix();
+    createNeuronsPerLayer(INPUT_LAYER_NUM_X, inputLayer, time);
+    // printNeuronsLayer(INPUT_LAYER_NUM, inputLayer);
 
-    int start_x = 5;
-    int start_y = 5;
-
-    int pos = 0;
-
-    for(int y = 0; y < len_y; y++){
-        pos = y * 28;
-        for(int x = 0; x < len_x; x++){
-            pos++;
-            float *stimulus = (float*) calloc(time, sizeof(float)); 
-            for(int i = 0; i < time; i++){
-                stimulus[i] = test_image[0][pos];
-            }
-            // printf("[%1.1f , %1.1f, ... , %1.1f, %1.1f]\n", stimulus[0], stimulus[1], stimulus[time-2], stimulus[time-1]);
-            spikeGenerator(stimulus, time, neurons[y][x]);
-            free(stimulus);
-        }
-    }
-
-    // Print generated spikes
-    // for(int y = 0; y < len_y; y++){
-    //     for(int x = 0; x < len_x; x++){
-    //         for(int i = 0; i < time; i++){
-    //             if(neurons[y][x]->spike[i] > 0.0){
-    //                 printf("Neuron {%d/%d} : Fire at position [%d] with value [%2.3f]\n", y, x, i, neurons[y][x]->spike[i]);
-    //             }
-    //         }
-    //     }
-    // }
-
-    int l2Neurons_x = (int)len_x/stride[0];
-    int l2Neurons_y = (int)len_y/stride[0];
-
-    struct Neuron *layer2[l2Neurons_x][l2Neurons_y]; 
-    for(int y=0; y < l2Neurons_y; y++){
-        for(int x=0; x < l2Neurons_x; x++){
-            layer2[y][x] = neuron_Create();
-        }
-    }
-
-    float* l2Neurons_stimulus[l2Neurons_y][l2Neurons_x];
-    for(int y = 0; y < l2Neurons_y; y++){
-        for(int x = 0; x < l2Neurons_x; x++){
-            l2Neurons_stimulus[y][x] = (float*) calloc(time, sizeof(float));
-        }
-    }
-
-    int mult_factor = 49; // Number of neurons for each pixel
-
-    int l2x = 0;
-    int l2y = 0;
-
-    int x = 0;
-    int y = 0;
-
-    for(int ry = 0; ry < len_y; ry+=stride[0]){
-        l2x = 0;
-        for(int rx = 0; rx < len_x; rx+=stride[0]){
-            // printf("\nGenerating stimulus for L2 neurons %d/%d\n", l2y, l2x);
-            for(int ny = 0; ny < stride[0]; ny++){
-                for(int nx = 0; nx < stride[0]; nx++){
-                    x = rx + nx;
-                    y = ry + ny;
-                    for(int i = 0; i < time; i++){
-                        l2Neurons_stimulus[l2y][l2x][i] = l2Neurons_stimulus[l2y][l2x][i] + neurons[y][x]->spike[i]*mult_factor;
-                    }
+    // Create stimulus for the input layer using Poisson distribution
+    int count = 0;
+    float n_random;
+    for(int pos_y = 0; pos_y < INPUT_LAYER_NUM_X; pos_y++){
+        for(int pos_x = 0; pos_x < INPUT_LAYER_NUM_X; pos_x++){
+            count++;
+            for(int i=0; i < time; i++){
+                n_random = (float)rand()/(float)(RAND_MAX/1);
+                if( (test_image[N_TEST_IMAGE][count]*dt) > n_random){
+                    inputLayer[pos_y][pos_x]->spike[time] = 1.0;
                 }
             }
-            // printf("Adding stimulus for l2 neuron %d/%d, duration=%d\n",l2y, l2x, time);
-            l2x++;
-        }
-        l2y++;
-    }
-
-    // Print l2 Neurons stimulus
-    // for(int i=0; i < l2Neurons_y; i++){
-    //     for(int j = 0; j < l2Neurons_x; j++){
-    //         if(l2Neurons_stimulus[i][j] != NULL){
-    //             printf("Neuron %d/%d:\n", i,j);
-    //             printOnlyWhenFire(l2Neurons_stimulus[i][j], time);
-    //             printf("\n");
-    //         }
-    //     }
-    // }
-
-    // Run spikes through L2 Neurons
-    for(int y = 0; y < l2Neurons_y; y++){
-        for(int x = 0; x < l2Neurons_x; x++){
-            spikeGenerator(l2Neurons_stimulus[y][x], time, layer2[y][x]);
         }
     }
 
-    // Print layer 2 spike
-    // for(int y = 0; y < l2Neurons_y; y++){
-    //     for(int x = 0; x < l2Neurons_x; x++){
-    //         if(layer2[y][x] != NULL){
-    //             printf("Neuron %d/%d:\n", y, x);
-    //             printOnlyWhenFire(layer2[y][x]->spike, time);
-    //             printf("\n");
-    //         }
-    //     }
-    // }
+    createNeuronsPerLayer(HIDDEN_LAYER_NUM_X, exc_hiddenLayer, time);
+    createNeuronsPerLayer(HIDDEN_LAYER_NUM_X, inh_hiddenLayer, time);
 
+    // Connection all-to-all
+    
 
+    // Connection one-to-one from excitatory to inhibitory layer
 
-    freeNeurons();
+    // Create output layer
+    for(int i = 0; i < OUTPUT_LAYER_NUM; i++){
+        outputLayer[i] = createNeuron();
+        initList(outputLayer[i], time);
+    }
+
+    freeNeuronsOutputLayer(OUTPUT_LAYER_NUM, outputLayer);
+    freeNeuronsPerLayer(HIDDEN_LAYER_NUM_X, inh_hiddenLayer);
+    freeNeuronsPerLayer(HIDDEN_LAYER_NUM_X, exc_hiddenLayer);
+    freeNeuronsPerLayer(INPUT_LAYER_NUM_X, inputLayer);
 
     return 0; 
 }
