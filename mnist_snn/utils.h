@@ -6,7 +6,8 @@
 double min(double matrix[N_FIRST_LAYER])
 {
     double min = matrix[0];
-    for (int i = 0; i < N_FIRST_LAYER; i++)
+    int i;
+    for (i = 0; i < N_FIRST_LAYER; i++)
     {
         if (min > matrix[i])
         {
@@ -19,7 +20,8 @@ double min(double matrix[N_FIRST_LAYER])
 double max(double matrix[N_FIRST_LAYER])
 {
     double max = matrix[0];
-    for (int i = 0; i < N_FIRST_LAYER; i++)
+    int i;
+    for (i = 0; i < N_FIRST_LAYER; i++)
     {
         if (max < matrix[i])
         {
@@ -55,7 +57,8 @@ int argmax(double *list, int lenList)
 {
     int index = 0;
     double max = list[0];
-    for (int i = 1; i < lenList; i++)
+    int i;
+    for (i = 1; i < lenList; i++)
     {
         if (max < list[i])
         {
