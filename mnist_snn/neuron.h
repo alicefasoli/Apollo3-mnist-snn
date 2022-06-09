@@ -1,36 +1,56 @@
-#ifndef NEURON_H
-#define NEURON_H
+#ifndef __NEURON_H__
+#define __NEURON_H__
 
-typedef struct Neuron{
-    float dt;       // Simulation time step
-	float t_rest;   // Initial refractory time
+#include "parameters.h"
 
-    float *Vm;      // Neuron potential (mV) list
-    int *time;      // Time duration for the neuron list
-    float *spike;   // Output spikes for the neuron list
-	
-    float t;        // Neuron time step
-    float Rm;       // Resistance (kOhm)
-    float Cm;       // Capacitance (uF)
-    float tau_m;    // Time constant
-    float tau_ref;  // Refractory period
-    float Vth;      // Spike threshold
-    float V_spike;  // Spike delta (V)
+typedef struct Neuron
+{
+    double p;
+    double p_th;
 
-    int p;          // Potential
-    int p_rest;     // Resting potential: neurons have a small negative electical charge of -70 mV
+    int t_rest;
+    int t_ref;
 
-    void (*spikeGenerator)(float*, struct Neuron*);
-}Neuron;
+    void (*hyperpolarization)(struct Neuron *, int);
+    void (*inhibit)(struct Neuron *, int);
+} Neuron;
 
-Neuron *createNeuron(void);
-void initList(Neuron*, int);
+Neuron *initial(void)
+{
+    Neuron *n = (struct Neuron *)malloc(sizeof(struct Neuron));
+    if (n != 0)
+    {
+        n->p_th = p_th;
+        n->p = p_rest;
+        n->t_rest = -1;
+        n->t_ref = 15; //(us)
+    }
+    return n;
+}
 
-void destroyNeuron(Neuron *);
-void printNeuron(Neuron *);
+void destroyNeuron(Neuron *n)
+{
+    free(n);
+}
 
-void spikeGenerator(float*, int, Neuron*);
+void reset(struct Neuron *n)
+{
+    n->p_th = p_th;
+    n->p = p_rest;
+    n->t_rest = -1;
+    n->t_ref = 15; //(us)
+}
 
-void 
+void hyperpolarization(struct Neuron *n, int t)
+{
+    n->p = p_hyperpolarization;
+    n->t_rest = t + n->t_ref;
+}
+
+void inhibit(struct Neuron *n, int t)
+{
+    n->p = p_inhibit;
+    n->t_rest = t + n->t_ref;
+}
 
 #endif
