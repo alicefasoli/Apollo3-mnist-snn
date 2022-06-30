@@ -33,21 +33,21 @@ float p_hyperpolarization = -90.0;
 float p_drop = 0.8;
 float p_th_drop = 0.4;
 
-double w_min = 0.00001;
-double w_max = 1.0; // np.max(synapse_init)
+float w_min = 0.00001;
+float w_max = 1.0; // np.max(synapse_init)
 
 // STDP parameters
-double stdp_offset = 0.0;
-double sigma = 0.01;
-double A_plus = 0.8;
-// double A_plus = 0.6;
-double A_minus = 0.8;
-// double A_minus = 0.3;
-double tau_plus = 5.0;
-// double tau_plus = 8.0;
-double tau_minus = 5.0;
-// double tau_minus = 3.0;
-double mu = 0.9;
+float stdp_offset = 0.0;
+float sigma = 0.01;
+float A_plus = 0.8;
+float A_minus = 0.8;
+float tau_plus = 5.0;
+float tau_minus = 5.0;
+float mu = 0.9;
+// float A_plus = 0.6;
+// float A_minus = 0.3;
+// float tau_plus = 8.0;
+// float tau_minus = 3.0;
 
 // Receptive field parameters
 float w[5][5] = {{-0.5, -0.125, 0.25, -0.125, -0.25},
