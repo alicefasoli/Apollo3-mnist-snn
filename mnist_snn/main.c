@@ -95,7 +95,6 @@ int main()
     load_mnist();
 
     int n_img = 0;
-
     do
     {
         if (cont_0 < FOTO && train_label[n_img] == 0)
@@ -153,13 +152,6 @@ int main()
 
     } while (cont_0 + cont_1 + cont_2 + cont_3 + cont_4 + cont_5 + cont_6 + cont_7 + cont_8 + cont_9 != N_SECOND_LAYER);
 
-    // printf("Resume: %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n", cont_0, cont_1, cont_2, cont_3, cont_4, cont_5, cont_6, cont_7, cont_8, cont_9);
-
-    // for (int i = 0; i < N_SECOND_LAYER; i++)
-    // {
-    //     printf("%d ", img_to_train[i]);
-    // }
-
     int train_img = 0;
 
     for (n_train = 0; n_train < N_SECOND_LAYER; n_train++) // NUM_TRAIN
@@ -193,6 +185,7 @@ int main()
         max = -10000.0;
         for (lpPx_x_rf = 0; lpPx_x_rf < PIXEL; lpPx_x_rf++) // loop for receptive field convolution
         {
+            // printf("[");
             for (lpPx_y_rf = 0; lpPx_y_rf < PIXEL; lpPx_y_rf++)
             {
                 sum = 0.0;
@@ -200,13 +193,14 @@ int main()
                 {
                     for (n = 0; n < 5; n++)
                     {
-                        if ((lpPx_x_rf + ran[m]) >= 0 && (lpPx_x_rf + ran[m]) <= 27 && (lpPx_y_rf + ran[n]) >= 0 && (lpPx_y_rf + ran[n]) <= 27)
+                        if ((lpPx_x_rf + (float)ran[m]) >= 0 && (lpPx_x_rf + (float)ran[m]) <= (PIXEL - 1) && (lpPx_y_rf + (float)ran[n]) >= 0 && (lpPx_y_rf + (float)ran[n]) <= (PIXEL - 1))
                         {
-                            sum = sum + w[ox + m][oy + n] * actual_img[lpPx_x_rf + m][lpPx_y_rf + n];
+                            sum = sum + w[ox + ran[m]][oy + ran[n]] * (actual_img[lpPx_x_rf + ran[m]][lpPx_y_rf + ran[n]] / 255.0);
                         }
                     }
                 }
                 pot[(lpPx_x_rf * PIXEL) + lpPx_y_rf] = sum;
+                // printf("%2.4f ", pot[(lpPx_x_rf * PIXEL) + lpPx_y_rf]);
 
                 if (min > pot[(lpPx_x_rf * PIXEL) + lpPx_y_rf])
                 {
@@ -218,6 +212,7 @@ int main()
                     max = pot[(lpPx_x_rf * PIXEL) + lpPx_y_rf];
                 }
             }
+            // printf("]\n");
         }
         // printf("Min pot : %2.1f\n", min);
         // printf("Max pot : %2.1f\n", max);
@@ -393,9 +388,12 @@ int main()
                 fp[0] = 0.0;
                 fp[1] = 255.0;
                 img[x][y] = interp(weight_matrix[x][y], xp, fp);
-                if(img[x][y] > 25.0){
+                if (img[x][y] > 25.0)
+                {
                     printf("@ ");
-                }else{
+                }
+                else
+                {
                     printf("- ");
                 }
             }
