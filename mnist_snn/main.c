@@ -36,10 +36,10 @@ int main()
     int lpPx_y = 0;
 
     FILE *f_weights;
-    f_weights = fopen("weights.csv", "rw+");
+    f_weights = fopen("weights.txt", "rw+");
 
     FILE *f_labels;
-    f_labels = fopen("labels.csv", "rw+");
+    f_labels = fopen("labels.txt", "rw+");
 
     float train[N_FIRST_LAYER * (t + 1)];
     float actual_img[PIXEL][PIXEL];
@@ -79,6 +79,8 @@ int main()
 
     float rl_t;
 
+    int *img_to_train = (int *)calloc(N_SECOND_LAYER, sizeof(int));
+
     int cont_0 = 0;
     int cont_1 = 0;
     int cont_2 = 0;
@@ -92,23 +94,94 @@ int main()
 
     load_mnist();
 
-    for (n_train = 0; n_train < 800; n_train++) // NUM_TRAIN
+    int n_img = 0;
+
+    do
     {
+        if (cont_0 < FOTO && train_label[n_img] == 0)
+        {
+            img_to_train[cont_0 + cont_1 + cont_2 + cont_3 + cont_4 + cont_5 + cont_6 + cont_7 + cont_8 + cont_9] = n_img;
+            cont_0++;
+        }
+        else if (cont_1 < FOTO && train_label[n_img] == 1)
+        {
+            img_to_train[cont_0 + cont_1 + cont_2 + cont_3 + cont_4 + cont_5 + cont_6 + cont_7 + cont_8 + cont_9] = n_img;
+            cont_1++;
+        }
+        else if (cont_2 < FOTO && train_label[n_img] == 2)
+        {
+            img_to_train[cont_0 + cont_1 + cont_2 + cont_3 + cont_4 + cont_5 + cont_6 + cont_7 + cont_8 + cont_9] = n_img;
+            cont_2++;
+        }
+        else if (cont_3 < FOTO && train_label[n_img] == 3)
+        {
+            img_to_train[cont_0 + cont_1 + cont_2 + cont_3 + cont_4 + cont_5 + cont_6 + cont_7 + cont_8 + cont_9] = n_img;
+            cont_3++;
+        }
+        else if (cont_4 < FOTO && train_label[n_img] == 4)
+        {
+            img_to_train[cont_0 + cont_1 + cont_2 + cont_3 + cont_4 + cont_5 + cont_6 + cont_7 + cont_8 + cont_9] = n_img;
+            cont_4++;
+        }
+        else if (cont_5 < FOTO && train_label[n_img] == 5)
+        {
+            img_to_train[cont_0 + cont_1 + cont_2 + cont_3 + cont_4 + cont_5 + cont_6 + cont_7 + cont_8 + cont_9] = n_img;
+            cont_5++;
+        }
+        else if (cont_6 < FOTO && train_label[n_img] == 6)
+        {
+            img_to_train[cont_0 + cont_1 + cont_2 + cont_3 + cont_4 + cont_5 + cont_6 + cont_7 + cont_8 + cont_9] = n_img;
+            cont_6++;
+        }
+        else if (cont_7 < FOTO && train_label[n_img] == 7)
+        {
+            img_to_train[cont_0 + cont_1 + cont_2 + cont_3 + cont_4 + cont_5 + cont_6 + cont_7 + cont_8 + cont_9] = n_img;
+            cont_7++;
+        }
+        else if (cont_8 < FOTO && train_label[n_img] == 8)
+        {
+            img_to_train[cont_0 + cont_1 + cont_2 + cont_3 + cont_4 + cont_5 + cont_6 + cont_7 + cont_8 + cont_9] = n_img;
+            cont_8++;
+        }
+        else if (cont_9 < FOTO && train_label[n_img] == 9)
+        {
+            img_to_train[cont_0 + cont_1 + cont_2 + cont_3 + cont_4 + cont_5 + cont_6 + cont_7 + cont_8 + cont_9] = n_img;
+            cont_9++;
+        }
+
+        n_img++;
+
+    } while (cont_0 + cont_1 + cont_2 + cont_3 + cont_4 + cont_5 + cont_6 + cont_7 + cont_8 + cont_9 != N_SECOND_LAYER);
+
+    // printf("Resume: %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n", cont_0, cont_1, cont_2, cont_3, cont_4, cont_5, cont_6, cont_7, cont_8, cont_9);
+
+    // for (int i = 0; i < N_SECOND_LAYER; i++)
+    // {
+    //     printf("%d ", img_to_train[i]);
+    // }
+
+    int train_img = 0;
+
+    for (n_train = 0; n_train < N_SECOND_LAYER; n_train++) // NUM_TRAIN
+    {
+        train_img = img_to_train[n_train];
+
         start = clock();
-        printf("%d : \n", n_train);
+        printf("%d.png [%d]: \n", train_img, n_train);
 
         for (lpPx_x = 0; lpPx_x < PIXEL; lpPx_x++) // loop for pixel in axes x
         {
             // printf("[");
             for (lpPx_y = 0; lpPx_y < PIXEL; lpPx_y++) // loop for pixel in axes y
             {
-                if (train_image[n_train][(lpPx_x * PIXEL) + lpPx_y] == 1.0)
+                // actual_img[lpPx_x][lpPx_y] = train_image[train_img][(lpPx_x * PIXEL) + lpPx_y];
+                if (train_image[train_img][(lpPx_x * PIXEL) + lpPx_y] == 1.0)
                 {
                     actual_img[lpPx_x][lpPx_y] = 255.0;
                 }
                 else
                 {
-                    actual_img[lpPx_x][lpPx_y] = train_image[n_train][(lpPx_x * PIXEL) + lpPx_y] * 256.0;
+                    actual_img[lpPx_x][lpPx_y] = train_image[train_img][(lpPx_x * PIXEL) + lpPx_y] * 256.0;
                 }
                 // printf("%2.f ", actual_img[lpPx_x][lpPx_y]);
             }
@@ -275,42 +348,7 @@ int main()
             reset(output_layer[lp_reset]);
         }
 
-        label_neuron[winner] = train_label[n_train];
-        switch (train_label[n_train])
-        {
-        case 0:
-            cont_0++;
-            break;
-        case 1:
-            cont_1++;
-            break;
-        case 2:
-            cont_2++;
-            break;
-        case 3:
-            cont_3++;
-            break;
-        case 4:
-            cont_4++;
-            break;
-        case 5:
-            cont_5++;
-            break;
-        case 6:
-            cont_6++;
-            break;
-        case 7:
-            cont_7++;
-            break;
-        case 8:
-            cont_8++;
-            break;
-        case 9:
-            cont_9++;
-            break;
-        default:
-            break;
-        }
+        label_neuron[winner] = train_label[train_img];
         printf("Label neuron : %d\n", label_neuron[winner]);
 
         end = clock();
@@ -330,35 +368,40 @@ int main()
         printf("Learning duration : %.3f sec\n", time_used);
     }
 
-    printf("Resume: %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n", cont_0, cont_1, cont_2, cont_3, cont_4, cont_5, cont_6, cont_7, cont_8, cont_9);
+    printf("Reconstructed images : \n");
+    for (lp_third = 0; lp_third < N_SECOND_LAYER; lp_third++)
+    {
+        // if (label_neuron[lp_third] == -1)
+        // {
+        //     for (int lp_index = 0; lp_index < N_FIRST_LAYER; lp_index++)
+        //     {
+        //         synapse[(lp_third * N_FIRST_LAYER) + lp_index] = 0.0;
+        //     }
+        // }
 
-    // for (lp_third = 0; lp_third < N_SECOND_LAYER; lp_third++)
-    // {
-    //     if (label_neuron[lp_third] == -1)
-    //     {
-    //         for (int lp_index = 0; lp_index < N_FIRST_LAYER; lp_index++)
-    //         {
-    //             synapse[(lp_third * N_FIRST_LAYER) + lp_index] = 0.0;
-    //         }
-    //     }
-
-    // // Reconstruct weights
-    // float weight_matrix[PIXEL][PIXEL];
-    // float img[PIXEL][PIXEL];
-
-    // for (x = 0; x < PIXEL; x++)
-    // {
-    //     for (y = 0; y < PIXEL; y++)
-    //     {
-    //         weight_matrix[x][y] = synapse[(lp_third * N_FIRST_LAYER) + (x * PIXEL) + y];
-    //         xp[0] = w_min;
-    //         xp[1] = w_max;
-    //         fp[0] = 0.0;
-    //         fp[1] = 255.0;
-    //         img[x][y] = interp(weight_matrix[x][y], xp, fp);
-    //     }
-    // }
-    // }
+        // Reconstruct weights
+        float weight_matrix[PIXEL][PIXEL];
+        float img[PIXEL][PIXEL];
+        printf("%d.png : \n", img_to_train[lp_third]);
+        for (x = 0; x < PIXEL; x++)
+        {
+            for (y = 0; y < PIXEL; y++)
+            {
+                weight_matrix[x][y] = synapse[(lp_third * N_FIRST_LAYER) + (x * PIXEL) + y];
+                xp[0] = w_min;
+                xp[1] = w_max;
+                fp[0] = 0.0;
+                fp[1] = 255.0;
+                img[x][y] = interp(weight_matrix[x][y], xp, fp);
+                if(img[x][y] > 25.0){
+                    printf("@ ");
+                }else{
+                    printf("- ");
+                }
+            }
+            printf("\n");
+        }
+    }
 
     for (lp_fourth = 0; lp_fourth < N_SECOND_LAYER; lp_fourth++)
     {
@@ -390,6 +433,8 @@ int main()
     free(active_pot);
 
     free(temp);
+
+    free(img_to_train);
 
     return 0;
 }
