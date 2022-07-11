@@ -31,10 +31,10 @@ float interp(float x, float xp[2], float fp[2])
 int main()
 {
     FILE *f_weights;
-    f_weights = fopen("weights.csv", "r");
+    f_weights = fopen("weights.txt", "r");
 
     FILE *f_labels;
-    f_labels = fopen("labels.csv", "r");
+    f_labels = fopen("labels.txt", "r");
 
     if (f_labels == NULL || f_weights == NULL)
     {
@@ -42,7 +42,7 @@ int main()
     }
 
     int *neuron_labels = (int *)calloc(N_SECOND_LAYER, sizeof(int));
-    double *learned_weights = (double *)calloc(N_SECOND_LAYER * N_FIRST_LAYER, sizeof(double));
+    float *synapse = (float *)calloc(N_SECOND_LAYER * N_FIRST_LAYER, sizeof(float));
 
     int read_labels = 0;
     int record_labels = 0;
@@ -51,7 +51,7 @@ int main()
         read_labels = fscanf(f_labels, "%d,", &neuron_labels[record_labels]);
         if (read_labels != 1 && !feof(f_labels))
         {
-            printf("File format incorrect\n");
+            printf("File label format incorrect\n");
             return 1;
         }
         record_labels++;
@@ -66,26 +66,17 @@ int main()
     int record_column_weights = 0;
     do
     {
-        if (record_column_weights == N_FIRST_LAYER)
+        read_weights = fscanf(f_weights, "%f,", &synapse[(record_row_weights * N_FIRST_LAYER) + record_column_weights]);
+        if (read_weights != 1 && !feof(f_weights))
         {
-            read_weights = fscanf(f_weights, "%lf,\n", &learned_weights[(record_row_weights * N_FIRST_LAYER) + record_column_weights]);
-            if (read_weights != 1 && !feof(f_weights))
-            {
-                printf("File format incorrect\n");
-                return 1;
-            }
-            record_column_weights = 0;
-            record_row_weights++;
+            printf("File format incorrect\n");
+            return 1;
         }
-        else
+        record_column_weights++;
+        if (record_column_weights % N_FIRST_LAYER == 0)
         {
-            read_weights = fscanf(f_weights, "%lf,", &learned_weights[(record_row_weights * N_FIRST_LAYER) + record_column_weights]);
-            if (read_weights != 1 && !feof(f_weights))
-            {
-                printf("File format incorrect\n");
-                return 1;
-            }
-            record_column_weights++;
+            record_row_weights++;
+            record_column_weights = 0;
         }
     } while (!feof(f_weights));
 
@@ -100,26 +91,26 @@ int main()
     //     printf("[");
     //     for (int j = 0; j < N_FIRST_LAYER; j++)
     //     {
-    //         printf("%f,", learned_weights[(i * N_FIRST_LAYER) + j]);
+    //         printf("%f,", synapse[(i * N_FIRST_LAYER) + j]);
     //     }
     //     printf("]\n");
     // }
 
     float train[N_FIRST_LAYER * (t + 1)];
     float actual_img[PIXEL][PIXEL];
-    float pot[PIXEL * PIXEL];
 
+    float *pot = (float *)calloc(PIXEL * PIXEL, sizeof(float));
     float *temp = (float *)calloc(t + 1, sizeof(float));
-
+    
     Neuron *output_layer[N_SECOND_LAYER]; // Creating hidden layer of neurons
-    double *synapse = (double *)calloc(N_SECOND_LAYER * N_FIRST_LAYER, sizeof(double));
+    // float *synapse = (float *)calloc(N_SECOND_LAYER * N_FIRST_LAYER, sizeof(float));
     for (int i = 0; i < N_SECOND_LAYER; i++)
     {
         output_layer[i] = initial();
-        for (int j = 0; j < N_FIRST_LAYER; j++)
-        {
-            synapse[(i * N_FIRST_LAYER) + j] = learned_weights[(i * N_FIRST_LAYER) + j];
-        }
+        // for (int j = 0; j < N_FIRST_LAYER; j++)
+        // {
+        //     synapse[(i * N_FIRST_LAYER) + j] = learned_weights[(i * N_FIRST_LAYER) + j];
+        // }
     }
 
     clock_t start, end;
@@ -129,7 +120,7 @@ int main()
 
     int n_test, lpPx_x, lpPx_y, lpPx_x_rf, lpPx_y_rf, m, n, lp_pot, tmp, lpTime_tmp, lp_free, j, tm, lp_first, lp_dotProd, lp_active, lp_second, lp_third, lp_count;
 
-    int f_spike, winner, learning_neuron, argmax_count;
+    int winner, learning_neuron, argmax_count;
 
     float min, max, sum, dotProduct, argmax_active;
     float xp[2], fp[2], freq, time_period, time_of_spike;
@@ -139,12 +130,40 @@ int main()
     double predicted_class = 0.0;
     double cont_predicted_correct = 0.0;
 
-    // int *prediction_count = (int *)calloc(N_SECOND_LAYER * N_SECOND_LAYER, sizeof(int));
-
     int *count_spikes = (int *)calloc(N_SECOND_LAYER, sizeof(int));
     float *active_pot = (float *)calloc(N_SECOND_LAYER, sizeof(float));
 
-    for (n_test = 0; n_test < 5000; n_test++)
+    // printf("Reconstructed images : \n");
+    // for (int lp_reconst = 0; lp_reconst < N_SECOND_LAYER; lp_reconst++)
+    // {
+    //     // Reconstruct weights
+    //     float weight_matrix[PIXEL][PIXEL];
+    //     float img[PIXEL][PIXEL];
+    //     printf("%d.png: \n", lp_reconst);
+    //     for (int x = 0; x < PIXEL; x++)
+    //     {
+    //         for (int y = 0; y < PIXEL; y++)
+    //         {
+    //             weight_matrix[x][y] = synapse[(lp_reconst * N_FIRST_LAYER) + (x * PIXEL) + y];
+    //             xp[0] = w_min;
+    //             xp[1] = w_max;
+    //             fp[0] = 0.0;
+    //             fp[1] = 255.0;
+    //             img[x][y] = interp(weight_matrix[x][y], xp, fp);
+    //             if (img[x][y] > 200.0)
+    //             {
+    //                 printf("@ ");
+    //             }
+    //             else
+    //             {
+    //                 printf("- ");
+    //             }
+    //         }
+    //         printf("\n");
+    //     }
+    // }
+
+    for (n_test = 100; n_test < 300; n_test++)
     {
         start = clock();
         printf("%d : \n", n_test);
@@ -157,9 +176,10 @@ int main()
 
         for (lpPx_x = 0; lpPx_x < PIXEL; lpPx_x++) // loop for pixel in axes x
         {
-            printf("[");
+            // printf("[");
             for (lpPx_y = 0; lpPx_y < PIXEL; lpPx_y++) // loop for pixel in axes y
             {
+                // actual_img[lpPx_x][lpPx_y] = test_image[n_test][(lpPx_x * PIXEL) + lpPx_y];
                 if (test_image[n_test][(lpPx_x * PIXEL) + lpPx_y] == 1.0)
                 {
                     actual_img[lpPx_x][lpPx_y] = 255.0;
@@ -168,14 +188,14 @@ int main()
                 {
                     actual_img[lpPx_x][lpPx_y] = test_image[n_test][(lpPx_x * PIXEL) + lpPx_y] * 256.0;
                 }
-                printf("%2.f ", actual_img[lpPx_x][lpPx_y]);
+                // printf("%2.f ", actual_img[lpPx_x][lpPx_y]);
             }
-            printf("]\n");
+            // printf("]\n");
         }
 
         for (int i = 0; i < N_SECOND_LAYER; i++)
         {
-            output_layer[i] = initial();
+            reset(output_layer[i]);
         }
 
         // Receptive field convolution
@@ -183,6 +203,7 @@ int main()
         max = -10000.0;
         for (lpPx_x_rf = 0; lpPx_x_rf < PIXEL; lpPx_x_rf++) // loop for receptive field convolution
         {
+            // printf("[");
             for (lpPx_y_rf = 0; lpPx_y_rf < PIXEL; lpPx_y_rf++)
             {
                 sum = 0.0;
@@ -190,13 +211,14 @@ int main()
                 {
                     for (n = 0; n < 5; n++)
                     {
-                        if ((lpPx_x_rf + ran[m]) >= 0 && (lpPx_x_rf + ran[m]) <= 27 && (lpPx_y_rf + ran[n]) >= 0 && (lpPx_y_rf + ran[n]) <= 27)
+                        if ((lpPx_x_rf + (float)ran[m]) >= 0 && (lpPx_x_rf + (float)ran[m]) <= (PIXEL - 1) && (lpPx_y_rf + (float)ran[n]) >= 0 && (lpPx_y_rf + (float)ran[n]) <= (PIXEL - 1))
                         {
-                            sum = sum + w[ox + m][oy + n] * actual_img[lpPx_x_rf + m][lpPx_y_rf + n];
+                            sum = sum + w[ox + ran[m]][oy + ran[n]] * (actual_img[lpPx_x_rf + ran[m]][lpPx_y_rf + ran[n]] / 255.0);
                         }
                     }
                 }
                 pot[(lpPx_x_rf * PIXEL) + lpPx_y_rf] = sum;
+                // printf("%2.4f ", pot[(lpPx_x_rf * PIXEL) + lpPx_y_rf]);
 
                 if (min > pot[(lpPx_x_rf * PIXEL) + lpPx_y_rf])
                 {
@@ -208,6 +230,7 @@ int main()
                     max = pot[(lpPx_x_rf * PIXEL) + lpPx_y_rf];
                 }
             }
+            // printf("]\n");
         }
         // printf("Min pot : %2.1f\n", min);
         // printf("Max pot : %2.1f\n", max);
@@ -221,7 +244,7 @@ int main()
             fp[1] = 50.0;
             freq = interp(pot[lp_pot], xp, fp);
 
-            time_period = ceil(t / freq);
+            time_period = ceilf((float)t / freq);
 
             time_of_spike = time_period;
 
@@ -245,7 +268,6 @@ int main()
             }
         }
 
-        f_spike = 0;
         winner = 0;
         for (tm = 0; tm < (t + 1); tm++)
         {
@@ -256,22 +278,16 @@ int main()
                     dotProduct = 0.0;
                     for (lp_dotProd = 0; lp_dotProd < N_FIRST_LAYER; lp_dotProd++)
                     {
-                        // synapse[(lp_first * N_FIRST_LAYER) + lp_dotProd] = 1.0;
                         dotProduct = dotProduct + (synapse[(lp_first * N_FIRST_LAYER) + lp_dotProd] * train[(lp_dotProd * (t + 1)) + tm]);
                     }
-                    // printf("%2.1f : %d : %d\n", dotProduct, j, tm);
                     output_layer[lp_first]->p = output_layer[lp_first]->p + dotProduct;
 
                     if (output_layer[lp_first]->p > p_rest)
                     {
                         output_layer[lp_first]->p = output_layer[lp_first]->p - p_drop;
-                        if (output_layer[lp_first]->p_th > p_th)
-                        {
-                            output_layer[lp_first]->p_th = output_layer[lp_first]->p_th - p_th_drop;
-                        }
                     }
-                    active_pot[lp_first] = output_layer[lp_first]->p;
                 }
+                active_pot[lp_first] = output_layer[lp_first]->p;
             }
 
             argmax_active = active_pot[0];
@@ -343,12 +359,14 @@ int main()
     }
 
     free(neuron_labels);
-    free(learned_weights);
+    // free(synapse);
 
     // free(prediction_count);
 
     free(active_pot);
     free(count_spikes);
+
+    free(pot);
 
     free(temp);
     free(synapse);
