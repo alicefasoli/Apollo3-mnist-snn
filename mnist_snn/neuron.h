@@ -5,8 +5,8 @@
 
 typedef struct Neuron
 {
-    float p;
-    float p_th;
+    double p;
+    double p_th;
 
     int t_rest;
     int t_ref;

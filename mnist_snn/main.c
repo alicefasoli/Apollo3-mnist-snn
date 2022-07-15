@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <time.h>
+#include <math.h>
+#include <string.h>
 
 #include "neuron.h"
 #include "stdp.h"
@@ -40,6 +42,10 @@ int main()
     FILE *f_labels;
     f_labels = fopen("labels.txt", "rw+");
 
+    if(f_labels == NULL || f_weights == NULL){
+        return 1;
+    }
+
     double train[N_FIRST_LAYER * (t + 1)];
     double actual_img[PIXEL][PIXEL];
     double pot[PIXEL * PIXEL];
@@ -64,7 +70,7 @@ int main()
         }
     }
 
-    int img_to_train[N_SECOND_LAYER];
+    int* img_to_train= (int *)calloc(N_SECOND_LAYER, sizeof(int));
     int cont[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     load_mnist();
@@ -331,14 +337,6 @@ int main()
     // printf("Reconstructed images : \n");
     // for (i = 0; i < N_SECOND_LAYER; i++)
     // {
-    //     // if (label_neuron[i] == -1)
-    //     // {
-    //     //     for (j = 0; j < N_FIRST_LAYER; j++)
-    //     //     {
-    //     //         synapse[(i * N_FIRST_LAYER) + j] = 0.0;
-    //     //     }
-    //     // }
-
     //     // Reconstruct weights
     //     double weight_matrix[PIXEL][PIXEL];
     //     double img[PIXEL][PIXEL];
@@ -371,7 +369,7 @@ int main()
         fprintf(f_labels, "%d,", label_neuron[i]);
         for (j = 0; j < N_FIRST_LAYER; j++)
         {
-            fprintf(f_weights, "%f,", synapse[(i * N_FIRST_LAYER) + j]);
+            fprintf(f_weights, "%lf,", synapse[(i * N_FIRST_LAYER) + j]);
         }
         fprintf(f_weights, "\n");
     }
@@ -390,6 +388,8 @@ int main()
 
     free(count_spikes);
     free(active_pot);
+
+    free(img_to_train);
 
     return 0;
 }

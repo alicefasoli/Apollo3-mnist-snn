@@ -5,7 +5,6 @@
 #define N_SECOND_LAYER 800
 #define PIXEL 28
 #define FOTO 80
-#define N_TEST_IMAGES 160
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,34 +25,29 @@ int t_back = -5;
 int epoch = 1;
 
 // Input parameters
-float p_rest = -70.0;
+double p_rest = -70.0;
 
 // Neuron parameters
-float p_inhibit = -100.0;
-float p_th = -55.0;
-float p_hyperpolarization = -90.0;
-float p_drop = 0.8;
-float p_th_drop = 0.4;
+double p_inhibit = -100.0;
+double p_th = -55.0;
+double p_hyperpolarization = -90.0;
+double p_drop = 0.8;
+double p_th_drop = 0.4;
 
-float w_min = 0.00001;
-float w_max = 1.0; // np.max(synapse_init)
+double w_min = 0.00001;
+double w_max = 1.0; // np.max(synapse_init)
 
 // STDP parameters
-float stdp_offset = 0.0;
-// float sigma = 0.01;
-// float A_plus = 0.8;
-// float A_minus = 0.8;
-// float tau_plus = 5.0;
-// float tau_minus = 5.0;
-float mu = 0.9;
-float sigma = 0.025;
-float A_plus = 0.6;
-float A_minus = 0.3;
-float tau_plus = 8.0;
-float tau_minus = 3.0;
+double stdp_offset = 0.0;
+double sigma = 0.01;
+double A_plus = 0.8;
+double A_minus = 0.8;
+double tau_plus = 5.0;
+double tau_minus = 5.0;
+double mu = 0.9;
 
 // Receptive field parameters
-float w[5][5] = {{-0.5, -0.125, 0.125, -0.125, -0.5},
+double w[5][5] = {{-0.5, -0.125, 0.125, -0.125, -0.5},
                  {-0.125, 0.125, 0.625, 0.125, -0.125},
                  {0.125, 0.625, 1.0, 0.625, 0.125},
                  {-0.125, 0.125, 0.625, 0.125, -0.125},

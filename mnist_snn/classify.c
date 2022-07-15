@@ -32,8 +32,8 @@ int main()
 {
     int i, j, k, m, n, tm, n_test;
 
-    float predicted_class = 0.0;
-    float cont_predicted_correct = 0.0;
+    double predicted_class = 0.0;
+    double cont_predicted_correct = 0.0;
 
     FILE *f_weights;
     f_weights = fopen("weights.txt", "r");
@@ -47,7 +47,7 @@ int main()
     }
 
     int *neuron_labels = (int *)calloc(N_SECOND_LAYER, sizeof(int));
-    float *synapse = (float *)calloc(N_SECOND_LAYER * N_FIRST_LAYER, sizeof(float));
+    double *synapse = (double *)calloc(N_SECOND_LAYER * N_FIRST_LAYER, sizeof(double));
 
     int read_labels = 0;
     int record_labels = 0;
@@ -68,7 +68,7 @@ int main()
     int record_column_weights = 0;
     do
     {
-        read_weights = fscanf(f_weights, "%f,", &synapse[(record_row_weights * N_FIRST_LAYER) + record_column_weights]);
+        read_weights = fscanf(f_weights, "%lf,", &synapse[(record_row_weights * N_FIRST_LAYER) + record_column_weights]);
         if (read_weights != 1 && !feof(f_weights))
         {
             printf("File format incorrect\n");
@@ -83,8 +83,8 @@ int main()
     } while (!feof(f_weights));
     fclose(f_weights);
 
-    float train[N_FIRST_LAYER * (t + 1)];
-    float actual_img[PIXEL][PIXEL];
+    double train[N_FIRST_LAYER * (t + 1)];
+    double actual_img[PIXEL][PIXEL];
 
     int *count_spikes = (int *)calloc(N_SECOND_LAYER, sizeof(int));
     double *active_pot = (double *)calloc(N_SECOND_LAYER, sizeof(double));
@@ -125,7 +125,6 @@ int main()
         double sum;
         for (i = 0; i < PIXEL; i++) // loop for receptive field convolution
         {
-            // printf("[");
             for (j = 0; j < PIXEL; j++)
             {
                 sum = 0.0;
@@ -140,7 +139,6 @@ int main()
                     }
                 }
                 pot[(i * PIXEL) + j] = sum;
-                // printf("%2.4f ", pot[(i * PIXEL) + j]);
 
                 if (min > pot[(i * PIXEL) + j])
                 {
@@ -152,7 +150,6 @@ int main()
                     max = pot[(i * PIXEL) + j];
                 }
             }
-            // printf("]\n");
         }
         // printf("Min pot : %2.1f\n", min);
         // printf("Max pot : %2.1f\n", max);
@@ -264,7 +261,7 @@ int main()
         }
     }
 
-    float accurancy = -1.0;
+    double accurancy = -1.0;
     if (predicted_class != 0.0)
     {
         accurancy = (cont_predicted_correct / predicted_class) * 100.0;
