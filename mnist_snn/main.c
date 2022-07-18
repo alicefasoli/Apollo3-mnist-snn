@@ -302,6 +302,16 @@ int main()
     //     }
     // }
 
+    for (i = 0; i < N_SECOND_LAYER; i++)
+    {
+        fprintf(f_labels, "%d,", label_neuron[i]);
+        for (j = 0; j < N_FIRST_LAYER; j++)
+        {
+            fprintf(f_weights, "%lf,", synapse[(i * N_FIRST_LAYER) + j]);
+        }
+        fprintf(f_weights, "\n");
+    }
+
     // Free lists
     for (i = 0; i < N_SECOND_LAYER; i++)
     {
