@@ -1,146 +1,328 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include <time.h>
+#include <math.h>
+#include <string.h>
 
 #include "neuron.h"
-#include "list.h"
+#include "stdp.h"
+#include "parameters.h"
 #include "mnist.h"
 
-#define INPUT_LAYER_NUM_X 28
-#define HIDDEN_LAYER_NUM_X 10
-#define OUTPUT_LAYER_NUM 10
-
-#define N_TEST_IMAGE 15
-
-struct Neuron *inputLayer[INPUT_LAYER_NUM_X][INPUT_LAYER_NUM_X];
-struct Neuron *exc_hiddenLayer[HIDDEN_LAYER_NUM_X][HIDDEN_LAYER_NUM_X];
-struct Neuron *inh_hiddenLayer[HIDDEN_LAYER_NUM_X][HIDDEN_LAYER_NUM_X];
-struct Neuron *outputLayer[OUTPUT_LAYER_NUM];
-
-void createNeuronsPerLayer(int n, struct Neuron* layer[n][n], int duration)
+double interp(double x, double xp[2], double fp[2])
 {
-    for(int y = 0; y < n; y++){
-        for(int x = 0; x < n; x++){
-            layer[y][x] = createNeuron();
-            initList(layer[y][x], duration);
-        }
-    }  
-}
+    double x_interpoled;
+    double yi = fp[0] + ((x - xp[0]) / (xp[1] - xp[0])) * (fp[1] - fp[0]);
 
-void printNeuronsLayer(int n, struct Neuron** layer)
-{
-    for(int i = 0; i < n; i++){
-        printf("LIF %d : [", i);
-        printNeuron(layer[i]);
-        printf("]\n");
-    }  
-}
-
-void freeNeuronsPerLayer(int n, struct Neuron* layer[n][n])
-{
-    for(int y = 0; y < n; y++){
-        for(int x = 0; x < n; x++){
-            destroyNeuron(layer[y][x]);
-        }
-    }  
-}
-
-void freeNeuronsOutputLayer(int n, struct Neuron* layer[n])
-{
-    for(int y = 0; y < n; y++){
-        destroyNeuron(layer[y]);
-    }  
-}
-
-struct Neuron** propagateSignal(struct Neuron** layerFrom, struct Neuron** layerTo, int layerFromNum, int layerToNum, int duration)
-{
-    float* neurons_stimulus[layerToNum];
-    for(int i = 0; i < layerToNum; i++){
-        neurons_stimulus[i] = (float*) calloc(duration, sizeof(float));
+    if (yi < fp[0])
+    {
+        x_interpoled = fp[0];
+    }
+    else if (yi > fp[1])
+    {
+        x_interpoled = fp[1];
+    }
+    else
+    {
+        x_interpoled = yi;
     }
 
-    for(int i = 0; i < layerToNum; i++){
-        for(int j = 0; j < layerFromNum; j++){
-            for(int t = 0; t < duration; t++){
-                neurons_stimulus[i][t] = neurons_stimulus[i][t] + layerFrom[j]->spike[i];
-            }
-        }
-    }
-
-    // Run spikes through layer
-    for(int i = 0; i < layerToNum; i++){
-        spikeGenerator(neurons_stimulus[i], duration, layerTo[i]);
-    }
-
-    return layerTo;
-}
-
-void printSpikesPerLayer(int n, struct Neuron** layer, int duration)
-{
-    // Print generated spikes for output layer
-    for(int j = 0; j < n; j++){
-        for(int i = 0; i < duration; i++){
-            if(layer[j]->spike[i] > 0.0){
-                printf("Neuron {%d} : Fire at time %d s with value [%2.3f]\n", j, i, layer[j]->spike[i]);
-            }
-        }
-    }
+    return x_interpoled;
 }
 
 int main()
 {
-    int T = 2000; // total time to simulate (msec)
-    float dt = 1.25; // simulation timestep
-    int time = (int)T/dt;
-    
-    load_mnist();
+    int i, j, k, m, n, x, y, n_train, tm, t1;
 
-    // Print a mnist test image
-    // for(int i=0; i < (28*28); i++){
-    //     // printf("%1.1f ", test_image[N_TEST_IMAGE][i]);
-    //     if(test_image[N_TEST_IMAGE][i] > 0.0){
-    //         printf("@ ");
-    //     }else{
-    //         printf("- ");
-    //     }
-    //     if( (i+1) % 28 ==0 ) putchar('\n');
-    // }
+    clock_t start, end;
+    double time_used;
 
-    createNeuronsPerLayer(INPUT_LAYER_NUM_X, inputLayer, time);
-    // printNeuronsLayer(INPUT_LAYER_NUM, inputLayer);
+    FILE *f_weights;
+    f_weights = fopen("weights.txt", "rw+");
 
-    // Create stimulus for the input layer using Poisson distribution
-    int count = 0;
-    float n_random;
-    for(int pos_y = 0; pos_y < INPUT_LAYER_NUM_X; pos_y++){
-        for(int pos_x = 0; pos_x < INPUT_LAYER_NUM_X; pos_x++){
-            count++;
-            for(int i=0; i < time; i++){
-                n_random = (float)rand()/(float)(RAND_MAX/1);
-                if( (test_image[N_TEST_IMAGE][count]*dt) > n_random){
-                    inputLayer[pos_y][pos_x]->spike[time] = 1.0;
-                }
-            }
+    FILE *f_labels;
+    f_labels = fopen("labels.txt", "rw+");
+
+    if (f_labels == NULL || f_weights == NULL)
+    {
+        return 1;
+    }
+
+    double train[N_FIRST_LAYER * (t + 1)];
+    double actual_img[PIXEL][PIXEL];
+    double pot[PIXEL * PIXEL];
+
+    // Initialize matrix
+    Neuron *output_layer[N_SECOND_LAYER]; // Creating hidden layer of neurons
+    int label_neuron[N_SECOND_LAYER];     // Creating labels corresponding to neuron
+
+    double *synapse = (double *)calloc(N_SECOND_LAYER * N_FIRST_LAYER, sizeof(double)); // matrix [N_SECOND_LAYER][N_FIRST_LAYER]
+    int *synapse_memory = (int *)calloc(N_SECOND_LAYER * N_FIRST_LAYER, sizeof(int));   // matrix [N_SECOND_LAYER][N_FIRST_LAYER]
+
+    int *count_spikes = (int *)calloc(N_SECOND_LAYER, sizeof(int));
+    double *active_pot = (double *)calloc(N_SECOND_LAYER, sizeof(double));
+
+    for (i = 0; i < N_SECOND_LAYER; i++)
+    {
+        output_layer[i] = initial();
+        label_neuron[i] = -1;
+        for (j = 0; j < N_FIRST_LAYER; j++)
+        {
+            synapse[(i * N_FIRST_LAYER) + j] = 1.0;
         }
     }
 
-    createNeuronsPerLayer(HIDDEN_LAYER_NUM_X, exc_hiddenLayer, time);
-    createNeuronsPerLayer(HIDDEN_LAYER_NUM_X, inh_hiddenLayer, time);
+    load_mnist(); // Load mnist dataset
 
-    // Connection all-to-all
-    
+    for (n_train = 0; n_train < N_SECOND_LAYER; n_train++) // NUM_TRAIN
+    {
+        start = clock();
+        printf("[%d]: \n", n_train);
 
-    // Connection one-to-one from excitatory to inhibitory layer
+        for (i = 0; i < PIXEL; i++) // loop for pixel in axes x
+        {
+            printf("[");
+            for (j = 0; j < PIXEL; j++) // loop for pixel in axes y
+            {
+                actual_img[i][j] = train_image[n_train][(i * PIXEL) + j];
+                printf("%2.f ", actual_img[i][j]);
+            }
+            printf("]\n");
+        }
 
-    // Create output layer
-    for(int i = 0; i < OUTPUT_LAYER_NUM; i++){
-        outputLayer[i] = createNeuron();
-        initList(outputLayer[i], time);
+        // Receptive field convolution
+        double min = 0.0;
+        double max = -10000.0;
+        double sum;
+        for (i = 0; i < PIXEL; i++) // loop for receptive field convolution
+        {
+            for (j = 0; j < PIXEL; j++)
+            {
+                sum = 0.0;
+                for (m = 0; m < 5; m++)
+                {
+                    for (n = 0; n < 5; n++)
+                    {
+                        if ((i + (double)ran[m]) >= 0 && (i + (double)ran[m]) <= (PIXEL - 1) && (j + (double)ran[n]) >= 0 && (j + (double)ran[n]) <= (PIXEL - 1))
+                        {
+                            sum = sum + w[ox + ran[m]][oy + ran[n]] * (actual_img[i + ran[m]][j + ran[n]] / 255.0);
+                        }
+                    }
+                }
+                pot[(i * PIXEL) + j] = sum;
+
+                if (min > pot[(i * PIXEL) + j])
+                {
+                    min = pot[(i * PIXEL) + j];
+                }
+
+                if (max < pot[(i * PIXEL) + j])
+                {
+                    max = pot[(i * PIXEL) + j];
+                }
+            }
+        }
+        // printf("Min pot : %2.1f\n", min);
+        // printf("Max pot : %2.1f\n", max);
+
+        // Spike train encoding
+        double xp[2];
+        xp[0] = min;
+        xp[1] = max;
+
+        double fp[2] = {1.0, 50.0};
+        double freq, time_period, time_of_spike;
+        for (i = 0; i < N_FIRST_LAYER; i++) // loop for potential list
+        {
+            // Calculating firing rate proportional to the membrane potential
+            freq = interp(pot[i], xp, fp);
+
+            time_period = ceil((double)t / freq);
+
+            // Generating spikes according to the firing rate
+            time_of_spike = time_period;
+
+            for (j = 0; j < (t + 1); j++)
+            {
+                train[(i * (t + 1)) + j] = 0.0;
+            }
+
+            if (pot[i] > 0)
+            {
+                while (time_of_spike < t + 1)
+                {
+                    train[(i * (t + 1)) + (int)time_of_spike] = 1.0;
+                    time_of_spike = time_of_spike + time_period;
+                }
+            }
+        }
+
+        int winner = 0;
+
+        for (k = 0; k < N_SECOND_LAYER; k++)
+        {
+            count_spikes[k] = 0;
+            active_pot[k] = 0.0;
+        }
+
+        double dotProduct;
+        for (tm = 0; tm < (t + 1); tm++)
+        {
+            for (i = 0; i < N_SECOND_LAYER; i++)
+            {
+                if (output_layer[i]->t_rest < tm)
+                {
+                    dotProduct = 0.0;
+                    for (j = 0; j < N_FIRST_LAYER; j++)
+                    {
+                        dotProduct = dotProduct + (synapse[(i * N_FIRST_LAYER) + j] * train[(j * (t + 1)) + tm]);
+                    }
+                    output_layer[i]->p = output_layer[i]->p + dotProduct;
+
+                    if (output_layer[i]->p > p_rest)
+                    {
+                        output_layer[i]->p = output_layer[i]->p - p_drop;
+                        if (output_layer[i]->p_th > p_th)
+                        {
+                            output_layer[i]->p_th = output_layer[i]->p_th - p_th_drop;
+                        }
+                    }
+                    active_pot[i] = output_layer[i]->p;
+                }
+            }
+
+            double argmax_active = active_pot[0];
+            for (i = 0; i < N_SECOND_LAYER; i++)
+            {
+                if (argmax_active < active_pot[i])
+                {
+                    argmax_active = active_pot[i];
+                    winner = i;
+                }
+            }
+
+            double rl_t;
+            // Check for spikes and update weights
+            for (i = 0; i < N_SECOND_LAYER; i++)
+            {
+                if (i == winner && active_pot[i] > output_layer[i]->p_th)
+                {
+                    hyperpolarization(output_layer[i], tm);
+                    output_layer[i]->p_th = output_layer[i]->p_th - 1.0; // Increasing the neuron threshold
+                    count_spikes[i] = count_spikes[i] + 1;
+                    for (j = 0; j < N_FIRST_LAYER; j++)
+                    {
+                        for (t1 = 0; t1 > (t_back - 1); t1--) // from 0 to -5
+                        {
+                            // if presynaptic spike came before postsynaptic spike
+                            if (0 <= tm + t1 && tm + t1 < t + 1)
+                            {
+                                if (train[(j * (t + 1)) + (t + t1)] == 1.0) // if presynaptic spike was in the tolerance window
+                                {
+                                    rl_t = rl(t1);
+                                    synapse[(i * N_FIRST_LAYER) + j] = update(synapse[(i * N_FIRST_LAYER) + j], rl_t); // Update the weights of the synapse
+                                    synapse_memory[(i * N_FIRST_LAYER) + j] = 1;
+                                    break;
+                                }
+                            }
+                        }
+                        if (synapse_memory[(i * N_FIRST_LAYER) + j] != 1) // if presynaptic spike was not in the tolerance window
+                        {
+                            rl_t = rl(1); 
+                            synapse[(i * N_FIRST_LAYER) + j] = update(synapse[(i * N_FIRST_LAYER) + j], rl_t); // Reduce weights of that synapse
+                        }
+                    }
+                    for (k = 0; k < N_SECOND_LAYER; k++)
+                    {
+                        if (k != winner)
+                        {
+                            if (output_layer[k]->p > output_layer[k]->p_th)
+                            {
+                                count_spikes[k] = count_spikes[k] + 1;
+                            }
+                            inhibit(output_layer[k], tm); 
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        for (i = 0; i < N_SECOND_LAYER; i++)
+        {
+            reset(output_layer[i]); // Reset neuron potential to rest
+        }
+
+        label_neuron[winner] = train_label[n_train];
+        printf("Label neuron : %d\n", label_neuron[winner]);
+
+        end = clock();
+        time_used = (double)(end - start) / CLOCKS_PER_SEC;
+
+        int argmax_count = count_spikes[0];
+        int learning_neuron = 0;
+        for (i = 0; i < N_SECOND_LAYER; i++)
+        {
+            if (argmax_count < count_spikes[i])
+            {
+                argmax_count = count_spikes[i];
+                learning_neuron = i;
+            }
+        }
+        printf("Learning neuron : %d\n", learning_neuron);
+        printf("Learning duration : %.3f sec\n", time_used);
     }
 
-    freeNeuronsOutputLayer(OUTPUT_LAYER_NUM, outputLayer);
-    freeNeuronsPerLayer(HIDDEN_LAYER_NUM_X, inh_hiddenLayer);
-    freeNeuronsPerLayer(HIDDEN_LAYER_NUM_X, exc_hiddenLayer);
-    freeNeuronsPerLayer(INPUT_LAYER_NUM_X, inputLayer);
+    // printf("Reconstructed images : \n");
+    // for (i = 0; i < N_SECOND_LAYER; i++)
+    // {
+    //     // Reconstruct weights
+    //     double weight_matrix[PIXEL][PIXEL];
+    //     double img[PIXEL][PIXEL];
+    //     printf("%d.png : \n", img_to_train[i]);
+    //     for (x = 0; x < PIXEL; x++)
+    //     {
+    //         for (y = 0; y < PIXEL; y++)
+    //         {
+    //             weight_matrix[x][y] = synapse[(i * N_FIRST_LAYER) + (x * PIXEL) + y];
+    //             xp[0] = w_min;
+    //             xp[1] = w_max;
+    //             fp[0] = 0.0;
+    //             fp[1] = 255.0;
+    //             img[x][y] = interp(weight_matrix[x][y], xp, fp);
+    //             if (img[x][y] > 25.0)
+    //             {
+    //                 printf("@ ");
+    //             }
+    //             else
+    //             {
+    //                 printf("- ");
+    //             }
+    //         }
+    //         printf("\n");
+    //     }
+    // }
 
-    return 0; 
+    for (i = 0; i < N_SECOND_LAYER; i++)
+    {
+        fprintf(f_labels, "%d,", label_neuron[i]);
+        for (j = 0; j < N_FIRST_LAYER; j++)
+        {
+            fprintf(f_weights, "%lf,", synapse[(i * N_FIRST_LAYER) + j]);
+        }
+        fprintf(f_weights, "\n");
+    }
+
+    // Free lists
+    for (i = 0; i < N_SECOND_LAYER; i++)
+    {
+        free(output_layer[i]);
+    }
+
+    free(synapse);
+    free(synapse_memory);
+
+    free(count_spikes);
+    free(active_pot);
+
+    return 0;
 }
