@@ -83,6 +83,7 @@ int main()
     } while (!feof(f_weights));
     fclose(f_weights);
 
+    // Initialize matrix
     double train[N_FIRST_LAYER * (t + 1)];
     double actual_img[PIXEL][PIXEL];
 
@@ -96,9 +97,9 @@ int main()
         output_layer[i] = initial();
     }
 
-    load_mnist();
+    load_mnist(); // Load mnist dataset
 
-    for (n_test = 0; n_test < 50; n_test++)
+    for (n_test = 0; n_test < 80; n_test++)
     {
         printf("Input image: \n");
         for (i = 0; i < PIXEL; i++) // loop for pixel in axes x
@@ -206,37 +207,36 @@ int main()
                 active_pot[i] = output_layer[i]->p;
             }
 
+            argmax_active = active_pot[0];
+            for (j = 0; j < N_SECOND_LAYER; j++)
+            {
+                if (argmax_active < active_pot[j])
+                {
+                    argmax_active = active_pot[j];
+                    winner = j;
+                }
+            }
+
             for (i = 0; i < N_SECOND_LAYER; i++)
             {
-                argmax_active = active_pot[0];
-                for (j = 0; j < N_SECOND_LAYER; j++)
+                if (i == winner && active_pot[i] > output_layer[i]->p_th)
                 {
-                    if (argmax_active < active_pot[j])
-                    {
-                        argmax_active = active_pot[j];
-                        winner = j;
-                    }
-                }
+                    hyperpolarization(output_layer[i], tm);
+                    output_layer[i]->p_th = output_layer[i]->p_th - 1.0;
+                    count_spikes[i] = count_spikes[i] + 1;
 
-                if (i == winner)
-                {
-                    if (active_pot[i] > output_layer[i]->p_th)
+                    for (k = 0; k < N_SECOND_LAYER; k++)
                     {
-                        count_spikes[i] = count_spikes[i] + 1;
-                        output_layer[i]->p_th = output_layer[i]->p_th - 1.0;
-                        hyperpolarization(output_layer[i], tm);
-                        for (k = 0; k < N_SECOND_LAYER; k++)
+                        if (k != winner)
                         {
-                            if (k != i)
+                            if (output_layer[k]->p > output_layer[k]->p_th)
                             {
-                                if (output_layer[k]->p > output_layer[k]->p_th)
-                                {
-                                    inhibit(output_layer[k], tm);
-                                }
+                                count_spikes[k] = count_spikes[k] + 1;
                             }
+                            inhibit(output_layer[k], tm);
                         }
-                        break;
                     }
+                    break;
                 }
             }
         }
@@ -259,6 +259,7 @@ int main()
         {
             cont_predicted_correct = cont_predicted_correct + 1.0;
         }
+        sleep(1);
     }
 
     double accurancy = -1.0;

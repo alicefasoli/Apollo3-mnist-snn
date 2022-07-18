@@ -4,10 +4,6 @@
 #include "parameters.h"
 #include <math.h>
 
-/*
-    This file implements STDP curve and weight update rule
-*/
-
 // Reinforcement learning curve
 double rl(int t)
 {

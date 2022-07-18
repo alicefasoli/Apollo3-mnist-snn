@@ -35,7 +35,7 @@ double p_drop = 0.8;
 double p_th_drop = 0.4;
 
 double w_min = 0.00001;
-double w_max = 1.0; // np.max(synapse_init)
+double w_max = 1.0;
 
 // STDP parameters
 double stdp_offset = 0.0;
@@ -47,6 +47,8 @@ double tau_minus = 5.0;
 double mu = 0.9;
 
 // Receptive field parameters
+
+// Tolerance window
 double w[5][5] = {{-0.5, -0.125, 0.125, -0.125, -0.5},
                  {-0.125, 0.125, 0.625, 0.125, -0.125},
                  {0.125, 0.625, 1.0, 0.625, 0.125},
