@@ -99,7 +99,7 @@ int main()
 
     load_mnist(); // Load mnist dataset
 
-    for (n_test = 0; n_test < 80; n_test++)
+    for (n_test = 0; n_test < NUM_TEST; n_test++)
     {
         printf("Input image: \n");
         for (i = 0; i < PIXEL; i++) // loop for pixel in axes x

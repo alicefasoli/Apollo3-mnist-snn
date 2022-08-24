@@ -37,10 +37,10 @@ int main()
     double time_used;
 
     FILE *f_weights;
-    f_weights = fopen("weights.txt", "rw+");
+    f_weights = fopen("weights.txt", "wb");
 
     FILE *f_labels;
-    f_labels = fopen("labels.txt", "rw+");
+    f_labels = fopen("labels.txt", "wb");
 
     if (f_labels == NULL || f_weights == NULL)
     {
@@ -323,6 +323,9 @@ int main()
 
     free(count_spikes);
     free(active_pot);
+
+    fclose(f_weights);
+    fclose(f_labels);
 
     return 0;
 }
