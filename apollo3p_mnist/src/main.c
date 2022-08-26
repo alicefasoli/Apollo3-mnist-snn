@@ -16,12 +16,12 @@
 //
 // Keep the LED pattern array in FLASH instead of SRAM.
 //
-static const uint8_t led_pattern[43] =
+static const uint8_t led_pattern[44] =
 {
     //
     // Binary count up
     //
-      1,  2,  3,  4,  5,  6,  7,  8,  9,  0,
+      1,  2,  3,  4,  5,  6,  7,  8,  9,  0, 16,
 
     //
     // Rotote left pattern
@@ -278,8 +278,10 @@ main(void)
 {
 		GPIO_init();
 	
-		uint32_t classified_image;
+		int classified_image;
 		classified_image = classify_image();
+	
+		// printf("Classification Done: %d", classified_image);
 	
 		switch(classified_image)
 		{
@@ -312,6 +314,9 @@ main(void)
 				break;
 			case 9:
 				activate(9); 						// Number 9
+				break;
+			case 16:
+				activate(16); 						// Wrong classification
 				break;
 			default:
 				all(true);

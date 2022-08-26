@@ -1,8 +1,6 @@
 #ifndef __PARAMETERS_H__
 #define __PARAMETERS_H__
 
-#include "apollo3p.h"
-
 /*
     This file contains all the parameters of the network
 */
@@ -13,8 +11,7 @@
 #define T 350
 
 // Simulation parameters
-uint16_t t_back = -5;
-uint16_t epoch = 1;
+int t_back = -5;
 
 // Input parameters
 double p_rest = -70.0;
@@ -37,8 +34,8 @@ double w[5][5] = {{-0.5, -0.125, 0.125, -0.125, -0.5},
                  {-0.125, 0.125, 0.625, 0.125, -0.125},
                  {-0.5, -0.125, 0.125, -0.125, -0.5}};
 
-uint16_t ran[5] = {-2, -1, 0, 1, 2};
-uint16_t ox = 2;
-uint16_t oy = 2;
+int ran[5] = {-2, -1, 0, 1, 2};
+int ox = 2;
+int oy = 2;
 
 #endif

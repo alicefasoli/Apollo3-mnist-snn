@@ -8,7 +8,7 @@ Copyright (C) 2022 ARM Ltd and ARM Germany GmbH. All rights reserved.
 License Information: Alice Fasoli, None, LIC=----
  
 Tool Versions:
-Toolchain:       MDK-Lite  Version: 5.37.0.0
+Toolchain:       MDK-ARM Professional  Version: 5.37.0.0
 Toolchain Path:  D:\Keil\ARM\ARMCLANG\Bin
 C Compiler:      ArmClang.exe V6.18
 Assembler:       Armasm.exe V6.18
@@ -21,8 +21,8 @@ Target DLL:      Segger\JL2CM3.dll V2.99.42.0
 Dialog DLL:      TCM.DLL V1.56.1.0
  
 <h2>Project:</h2>
-D:\Keil\AmbiqMicro\Apollo_DFP\1.3.0\Boards\Apollo3p_EVB\mnist_snn\mnist_snn.uvprojx
-Project File Date:  08/24/2022
+D:\Keil\AmbiqMicro\Apollo_DFP\1.3.0\Boards\Apollo3p_EVB\apollo3p_mnist\mnist_snn.uvprojx
+Project File Date:  08/26/2022
 
 <h2>Output:</h2>
 *** Using Compiler 'V6.18', folder: 'D:\Keil\ARM\ARMCLANG\Bin'
@@ -30,15 +30,12 @@ Build target 'project'
 Note: source file 'RTE/Device/AMA3B2KK-KBR/startup_apollo3p.s' - object file renamed from '.\Objects\startup_apollo3p.o' to '.\Objects\startup_apollo3p_1.o'.
 Note: source file 'RTE/Device/AMA3B2KK-KBR/startup_apollo3p.s' - object file renamed from '.\Objects\startup_apollo3p.o' to '.\Objects\startup_apollo3p_1.o'.
 Note: source file 'RTE/Device/AMA3B2KK-KBR/system_apollo3p.c' - object file renamed from '.\Objects\system_apollo3p.o' to '.\Objects\system_apollo3p_1.o'.
-compiling RTX_Config.c...
-compiling cmsis_os1.c...
-compiling system_apollo3p.c...
-compiling rtx_lib.c...
 compiling main.c...
 linking...
-.\Objects\mnist_snn.axf: error: L6047U: The size of this image (645900 bytes) exceeds the maximum allowed for this version of the linker
-Finished: 0 information, 0 warning, 0 error and 1 fatal error messages.
-".\Objects\mnist_snn.axf" - 1 Error(s), 0 Warning(s).
+Program Size: Code=14496 RO-data=312 RW-data=3568 ZI-data=38328  
+After Build - User command #1: fromelf --bin --output Objects\blinky.bin Objects\mnist_snn.axf
+After Build - User command #2: fromelf -cedrst --output Objects\mnist_snn.txt Objects\mnist_snn.axf
+".\Objects\mnist_snn.axf" - 0 Error(s), 0 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -82,28 +79,27 @@ Package Vendor: AmbiqMicro
       Source file:   CMSIS/RTOS2/RTX/Library/cmsis_os1.c
 
    * Component: ARM::CMSIS:RTOS2:Keil RTX5:Library:5.5.4
-      Library file:  CMSIS/RTOS2/RTX/Library/ARM/RTX_CM4F.lib
       Source file:   CMSIS/RTOS2/RTX/Template/Mutex.c
-      Include file:  CMSIS/RTOS2/RTX/Include/rtx_os.h
       Include file:  CMSIS/RTOS2/RTX/Config/RTX_Config.h
-      Source file:   CMSIS/RTOS2/RTX/Template/Timer.c
       Source file:   CMSIS/RTOS2/RTX/Config/RTX_Config.c
+      Include file:  CMSIS/RTOS2/RTX/Include/rtx_os.h
       Source file:   CMSIS/RTOS2/RTX/Template/main.c
-      Source file:   CMSIS/RTOS2/RTX/Template/svc_user.c
+      Source file:   CMSIS/RTOS2/RTX/Template/Events.c
       Source file:   CMSIS/RTOS2/RTX/Template/MemPool.c
       Source file:   CMSIS/RTOS2/RTX/Template/MsgQueue.c
-      Source file:   CMSIS/RTOS2/RTX/Template/Events.c
+      Source file:   CMSIS/RTOS2/RTX/Template/svc_user.c
       Source file:   CMSIS/RTOS2/RTX/Template/Semaphore.c
+      Library file:  CMSIS/RTOS2/RTX/Library/ARM/RTX_CM4F.lib
       Source file:   CMSIS/RTOS2/RTX/Template/Thread.c
+      Source file:   CMSIS/RTOS2/RTX/Template/Timer.c
       Source file:   CMSIS/RTOS2/RTX/Source/rtx_lib.c
 
    * Component: AmbiqMicro::Device:Startup:1.3.0
-      Source file:   Device/Source/startup_apollo3p.s
-      Source file:   Device/Source/system_apollo3p.c
-      Include file:  Device/Include/system_apollo3p.h
       Include file:  Device/Include/apollo3p.h
-Target not created.
-Build Time Elapsed:  00:00:03
+      Include file:  Device/Include/system_apollo3p.h
+      Source file:   Device/Source/system_apollo3p.c
+      Source file:   Device/Source/startup_apollo3p.s
+Build Time Elapsed:  00:00:01
 </pre>
 </body>
 </html>

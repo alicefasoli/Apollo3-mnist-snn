@@ -3,10 +3,18 @@
 
 #include "network_values.h"
 #include "parameters.h"
-#include "neuron.h"
 #include "actual_image.h"
 
 #include <math.h>
+
+typedef struct Neuron
+{
+    double p;
+    double p_th;
+
+    int t_rest;
+    int t_ref;
+} Neuron;
 
 double 
 interp(double x, double xp[2], double fp[2])
@@ -33,17 +41,23 @@ interp(double x, double xp[2], double fp[2])
 int
 classify_image(){
 		int i, j, k, m, n, tm;
+		int return_value;
 	
 		double train[N_FIRST_LAYER * (T + 1)];
 		double pot[PIXEL * PIXEL];
 
-		uint32_t count_spikes[N_SECOND_LAYER];
+		int count_spikes[N_SECOND_LAYER];
 		double active_pot[N_SECOND_LAYER];
 	
-		Neuron *output_layer[N_SECOND_LAYER]; // Creating hidden layer of neurons
+		Neuron output_layer[N_SECOND_LAYER]; // Creating hidden layer of neurons
     for (i = 0; i < N_SECOND_LAYER; i++)
     {
-        output_layer[i] = initial();
+				// Initialize neurons
+        output_layer[i].p = p_rest;
+				output_layer[i].p_th = p_th;
+				output_layer[i].t_rest = -1;
+				output_layer[i].t_ref = 15;
+				//
 				active_pot[i] = 0.0;
 				count_spikes[i] = 0;
     }
@@ -80,9 +94,7 @@ classify_image(){
 						}
 				}
 		}
-		// printf("Min pot : %2.1f\n", min);
-		// printf("Max pot : %2.1f\n", max);
-
+		
 		// Spike train encoding
 		double xp[2];
 		double fp[2] = {1.0, 50.0};
@@ -111,28 +123,30 @@ classify_image(){
 						}
 				}
 		}
-
+		
 		int winner = 0;
-		double dotProduct, argmax_active;
+		double dotProduct;
+		double argmax_active;
+		// long double tmp;
 		for (tm = 0; tm < (T + 1); tm++)
 		{
 				for (i = 0; i < N_SECOND_LAYER; i++)
 				{
-						if (output_layer[i]->t_rest < tm)
+						if (output_layer[i].t_rest < tm)
 						{
 								dotProduct = 0.0;
 								for (j = 0; j < N_FIRST_LAYER; j++)
 								{
 										dotProduct = dotProduct + (synapse[(i * N_FIRST_LAYER) + j] * train[(j * (T + 1)) + tm]);
 								}
-								output_layer[i]->p = output_layer[i]->p + dotProduct;
+								// output_layer[i].p = output_layer[i].p + dotProduct;
 
-								if (output_layer[i]->p > p_rest)
+								if (output_layer[i].p > p_rest)
 								{
-										output_layer[i]->p = output_layer[i]->p - p_drop;
+										output_layer[i].p = output_layer[i].p - p_drop;
 								}
 						}
-						active_pot[i] = output_layer[i]->p;
+						active_pot[i] = output_layer[i].p;
 				}
 
 				argmax_active = active_pot[0];
@@ -144,31 +158,37 @@ classify_image(){
 								winner = j;
 						}
 				}
-
+				
 				for (i = 0; i < N_SECOND_LAYER; i++)
 				{
-						if (i == winner && active_pot[i] > output_layer[i]->p_th)
+						if (i == winner && active_pot[i] > output_layer[i].p_th)
 						{
-								hyperpolarization(output_layer[i], tm);
-								output_layer[i]->p_th = output_layer[i]->p_th - 1.0;
+								// Hyperpolarization
+								output_layer[i].p = p_hyperpolarization;
+								output_layer[i].t_rest = tm + output_layer[i].t_ref;
+								//
+								output_layer[i].p_th = output_layer[i].p_th - 1.0;
 								count_spikes[i] = count_spikes[i] + 1;
 
 								for (k = 0; k < N_SECOND_LAYER; k++)
 								{
 										if (k != winner)
 										{
-												if (output_layer[k]->p > output_layer[k]->p_th)
+												if (output_layer[k].p > output_layer[k].p_th)
 												{
 														count_spikes[k] = count_spikes[k] + 1;
 												}
-												inhibit(output_layer[k], tm);
+												// Inhibition
+												output_layer[i].p = p_inhibit;
+												output_layer[i].t_rest = tm + output_layer[i].t_ref;
+												//
 										}
 								}
 								break;
 						}
 				}
 		}
-
+		
 		int argmax_count = count_spikes[0];
 		int learning_neuron = 0;
 		for (i = 0; i < N_SECOND_LAYER; i++)
@@ -180,7 +200,16 @@ classify_image(){
 				}
 		}
 		
-		return neuron_labels[learning_neuron];
+		int predicted_label = neuron_labels[learning_neuron];
+		if(predicted_label == actual_label)// Correct classified
+		{ 
+			return_value = predicted_label;
+		}else // Wrong classified
+		{ 
+			return_value = 16;
+		}
+		
+		return return_value;
 }
 
 
