@@ -2,9 +2,9 @@
 #define __PARAMETERS_H__
 
 #define N_FIRST_LAYER 784
-#define N_SECOND_LAYER 800
+#define N_SECOND_LAYER 100
 #define PIXEL 28
-#define FOTO 80
+#define FOTO 10
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,13 +28,10 @@ double w_min = 0.00001;
 double w_max = 1.0;
 
 // STDP parameters
-double stdp_offset = 0.1;
-double sigma = 0.0025; // learning rate
-double A_plus = 0.8;
-double A_minus = 0.7;
-double tau_plus = 10.0;
-double tau_minus = 9.0;
-double mu = 0.8;
+double sigma = 0.01; // learning rate
+double A = 0.8;
+double tau = 5.0;
+double mu = 0.9;
 
 // Receptive field parameters
 // Tolerance window

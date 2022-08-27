@@ -73,6 +73,8 @@ int main()
 
     load_mnist(); // Load mnist dataset
 
+    int total_cont = 0;
+
     for (n_train = 0; n_train < N_SECOND_LAYER; n_train++) // NUM_TRAIN
     {
         start = clock();
@@ -227,7 +229,7 @@ int main()
                         }
                         if (synapse_memory[(i * N_FIRST_LAYER) + j] != 1) // if presynaptic spike was not in the tolerance window
                         {
-                            rl_t = rl(1); 
+                            rl_t = rl(1);
                             synapse[(i * N_FIRST_LAYER) + j] = update(synapse[(i * N_FIRST_LAYER) + j], rl_t); // Reduce weights of that synapse
                         }
                     }
@@ -239,7 +241,7 @@ int main()
                             {
                                 count_spikes[k] = count_spikes[k] + 1;
                             }
-                            inhibit(output_layer[k], tm); 
+                            inhibit(output_layer[k], tm);
                         }
                     }
                     break;
@@ -302,6 +304,7 @@ int main()
     //     }
     // }
 
+    // Save weights
     for (i = 0; i < N_SECOND_LAYER; i++)
     {
         fprintf(f_labels, "%d,", label_neuron[i]);
@@ -311,6 +314,47 @@ int main()
         }
         fprintf(f_weights, "\n");
     }
+
+    // Create file network_values.h
+    FILE *network_values;
+    network_values = fopen("./apollo3p_mnist/src/network_values.h", "wb");
+
+    fprintf(network_values, "#ifndef __NETWORK_VALUES_H__\n");
+    fprintf(network_values, "#define __NETWORK_VALUES_H__\n\n");
+
+    fprintf(network_values, "#include \"parameters.h\"\n\n");
+
+    fprintf(network_values, "int neuron_labels[N_SECOND_LAYER]={");
+    for (i = 0; i < N_SECOND_LAYER; i++)
+    {
+        fprintf(network_values, "%d", (int)label_neuron[i]);
+        if (i != (N_SECOND_LAYER - 1))
+        {
+            fprintf(network_values, ",");
+        }
+    }
+    fprintf(network_values, "};\n\n");
+
+    fprintf(network_values, "double synapse[N_SECOND_LAYER * N_FIRST_LAYER]={");
+    for (i = 0; i < N_SECOND_LAYER; i++)
+    {
+        for (j = 0; j < N_FIRST_LAYER; j++)
+        {
+            fprintf(network_values, "%lf", synapse[(i * N_FIRST_LAYER) + j]);
+            if ((i == (N_SECOND_LAYER - 1)) && (j == (N_FIRST_LAYER - 1)))
+            {
+                fprintf(network_values, " ");
+            }else{
+                fprintf(network_values, ",");
+            }
+        }
+        fprintf(network_values, "\n");
+    }
+    fprintf(network_values, "};\n\n");
+
+    fprintf(network_values, "#endif\n");
+
+    fclose(network_values);
 
     // Free lists
     for (i = 0; i < N_SECOND_LAYER; i++)

@@ -9,11 +9,11 @@ double rl(int t)
 {
     if (t > 0)
     {
-        return -A_plus * (exp(-(double)t / tau_plus) - stdp_offset);
+        return A * (exp(-(double)t / tau));
     }
     else if (t <= 0)
     {
-        return A_minus * (exp((double)t / tau_minus) - stdp_offset);
+        return A * (exp((double)t / tau));
     }
 }
 

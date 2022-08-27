@@ -1,4 +1,5 @@
 #include <stdio.h>
+
 #include <time.h>
 #include <math.h>
 #include <string.h>
@@ -251,7 +252,7 @@ int main()
                 learning_neuron = i;
             }
         }
-
+        printf("Num : %d\n", n_test);
         printf("Predicted class : %d\n", neuron_labels[learning_neuron]);
         predicted_class = predicted_class + 1.0;
         printf("Actual class : %d\n", test_label[n_test]);
@@ -259,7 +260,6 @@ int main()
         {
             cont_predicted_correct = cont_predicted_correct + 1.0;
         }
-        sleep(1);
     }
 
     double accurancy = -1.0;
