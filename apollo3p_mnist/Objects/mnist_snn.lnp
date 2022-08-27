@@ -1,0 +1,12 @@
+--cpu=Cortex-M4.fp.sp
+".\objects\main.o"
+"..\..\..\..\..\..\ARM\CMSIS\5.9.0\CMSIS\RTOS2\RTX\Library\ARM\RTX_CM4F.lib"
+".\objects\cmsis_os1.o"
+".\objects\rtx_lib.o"
+".\objects\rtx_config.o"
+".\objects\startup_apollo3p_1.o"
+".\objects\system_apollo3p_1.o"
+--strict --scatter ".\Objects\mnist_snn.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\Listings\mnist_snn.map" -o .\Objects\mnist_snn.axf

@@ -1,0 +1,71 @@
+Dependencies for Project 'mnist_snn', Target 'project': (DO NOT MODIFY !)
+CompilerVersion: 6180000::V6.18::ARMCLANG
+F (.\src\main.c)(0x63088015)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__RTX -gdwarf-4 -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier-I./RTE/CMSIS-I./RTE/Device/AMA3B2KK-KBR-I./RTE/_project-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/Core/Include-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/RTOS2/Include-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/RTOS2/RTX/Include-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/RTOS2/RTX/Include1-ID:/Keil/AmbiqMicro/Apollo_DFP/1.3.0/Device/Include-D__UVISION_VERSION="537" -D_RTE_ -DAPOLLO3P_2048 -D_RTE_-o ./objects/main.o -MD)
+I (D:\Keil\ARM\ARMCLANG\include\stdint.h)(0x6252B538)
+I (D:\Keil\ARM\ARMCLANG\include\stdbool.h)(0x6252B536)
+I (D:\Keil\ARM\ARMCLANG\include\stdio.h)(0x6252B536)
+I (D:\Keil\AmbiqMicro\Apollo_DFP\1.3.0\Device\Include\apollo3p.h)(0x62F3D038)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\Core\Include\core_cm4.h)(0x626F9F3E)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\Core\Include\cmsis_version.h)(0x626F9F3E)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\Core\Include\cmsis_compiler.h)(0x626F9F3E)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\Core\Include\cmsis_armclang.h)(0x626F9F3E)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\Core\Include\mpu_armv7.h)(0x626F9F3E)
+I (D:\Keil\AmbiqMicro\Apollo_DFP\1.3.0\Device\Include\system_apollo3p.h)(0x62E11730)
+I (src\classify.h)(0x630884BA)
+I (src\network_values.h)(0x63087274)
+I (src\parameters.h)(0x63087C05)
+I (src\actual_image.h)(0x63087569)
+I (D:\Keil\ARM\ARMCLANG\include\math.h)(0x6252B536)
+F (.\src\parameters.h)(0x63087C05)()
+F (.\src\network_values.h)(0x63087274)()
+F (.\src\classify.h)(0x630884BA)()
+F (.\src\actual_image.h)(0x63087569)()
+F (D:/Keil/ARM/CMSIS/5.9.0/CMSIS/RTOS2/RTX/Library/ARM/RTX_CM4F.lib)(0x626F9F3E)()
+F (D:/Keil/ARM/CMSIS/5.9.0/CMSIS/RTOS2/RTX/Library/cmsis_os1.c)(0x626F9F3E)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__RTX -gdwarf-4 -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier-I./RTE/CMSIS-I./RTE/Device/AMA3B2KK-KBR-I./RTE/_project-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/Core/Include-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/RTOS2/Include-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/RTOS2/RTX/Include-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/RTOS2/RTX/Include1-ID:/Keil/AmbiqMicro/Apollo_DFP/1.3.0/Device/Include-D__UVISION_VERSION="537" -D_RTE_ -DAPOLLO3P_2048 -D_RTE_-o ./objects/cmsis_os1.o -MD)
+I (D:\Keil\ARM\ARMCLANG\include\string.h)(0x6252B536)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\RTOS2\RTX\Include1\cmsis_os.h)(0x626F9F3E)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\RTOS2\Include\cmsis_os2.h)(0x626F9F3E)
+I (D:\Keil\ARM\ARMCLANG\include\stdint.h)(0x6252B538)
+I (D:\Keil\ARM\ARMCLANG\include\stddef.h)(0x6252B536)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\RTOS2\RTX\Include\rtx_os.h)(0x626F9F3E)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\RTOS2\RTX\Include\rtx_def.h)(0x626F9F3E)
+I (RTE\_project\RTE_Components.h)(0x630880F8)
+I (RTE\CMSIS\RTX_Config.h)(0x626F9F3E)
+F (D:/Keil/ARM/CMSIS/5.9.0/CMSIS/RTOS2/RTX/Source/rtx_lib.c)(0x626F9F3E)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__RTX -gdwarf-4 -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier-I./RTE/CMSIS-I./RTE/Device/AMA3B2KK-KBR-I./RTE/_project-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/Core/Include-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/RTOS2/Include-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/RTOS2/RTX/Include-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/RTOS2/RTX/Include1-ID:/Keil/AmbiqMicro/Apollo_DFP/1.3.0/Device/Include-D__UVISION_VERSION="537" -D_RTE_ -DAPOLLO3P_2048 -D_RTE_-o ./objects/rtx_lib.o -MD)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\RTOS2\RTX\Include\rtx_os.h)(0x626F9F3E)
+I (D:\Keil\ARM\ARMCLANG\include\stdint.h)(0x6252B538)
+I (D:\Keil\ARM\ARMCLANG\include\stddef.h)(0x6252B536)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\RTOS2\Include\cmsis_os2.h)(0x626F9F3E)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\RTOS2\RTX\Include\rtx_def.h)(0x626F9F3E)
+I (RTE\_project\RTE_Components.h)(0x630880F8)
+I (RTE\CMSIS\RTX_Config.h)(0x626F9F3E)
+I (D:\Keil\AmbiqMicro\Apollo_DFP\1.3.0\Device\Include\apollo3p.h)(0x62F3D038)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\Core\Include\core_cm4.h)(0x626F9F3E)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\Core\Include\cmsis_version.h)(0x626F9F3E)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\Core\Include\cmsis_compiler.h)(0x626F9F3E)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\Core\Include\cmsis_armclang.h)(0x626F9F3E)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\Core\Include\mpu_armv7.h)(0x626F9F3E)
+I (D:\Keil\AmbiqMicro\Apollo_DFP\1.3.0\Device\Include\system_apollo3p.h)(0x62E11730)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\RTOS2\RTX\Include\rtx_evr.h)(0x626F9F3E)
+F (RTE/CMSIS/RTX_Config.c)(0x626F9F3E)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__RTX -gdwarf-4 -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier-I./RTE/CMSIS-I./RTE/Device/AMA3B2KK-KBR-I./RTE/_project-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/Core/Include-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/RTOS2/Include-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/RTOS2/RTX/Include-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/RTOS2/RTX/Include1-ID:/Keil/AmbiqMicro/Apollo_DFP/1.3.0/Device/Include-D__UVISION_VERSION="537" -D_RTE_ -DAPOLLO3P_2048 -D_RTE_-o ./objects/rtx_config.o -MD)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\Core\Include\cmsis_compiler.h)(0x626F9F3E)
+I (D:\Keil\ARM\ARMCLANG\include\stdint.h)(0x6252B538)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\Core\Include\cmsis_armclang.h)(0x626F9F3E)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\RTOS2\RTX\Include\rtx_os.h)(0x626F9F3E)
+I (D:\Keil\ARM\ARMCLANG\include\stddef.h)(0x6252B536)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\RTOS2\Include\cmsis_os2.h)(0x626F9F3E)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\RTOS2\RTX\Include\rtx_def.h)(0x626F9F3E)
+I (RTE\_project\RTE_Components.h)(0x630880F8)
+I (RTE\CMSIS\RTX_Config.h)(0x626F9F3E)
+F (RTE/CMSIS/RTX_Config.h)(0x626F9F3E)()
+F (RTE/Device/AMA3B2KK-KBR/startup_apollo3p.s)(0x62E11730)(--target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -masm=armasm -c-gdwarf-4 -Wa,armasm,--pd,"__RTX SETA 1"-I./RTE/CMSIS-I./RTE/Device/AMA3B2KK-KBR-I./RTE/_project-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/Core/Include-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/RTOS2/Include-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/RTOS2/RTX/Include-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/RTOS2/RTX/Include1-ID:/Keil/AmbiqMicro/Apollo_DFP/1.3.0/Device/Include-Wa,armasm,--pd,"__UVISION_VERSION SETA 537" -Wa,armasm,--pd,"_RTE_ SETA 1" -Wa,armasm,--pd,"APOLLO3P_2048 SETA 1" -Wa,armasm,--pd,"_RTE_ SETA 1"-o ./objects/startup_apollo3p_1.o)
+F (RTE/Device/AMA3B2KK-KBR/system_apollo3p.c)(0x62E11730)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__RTX -gdwarf-4 -O3 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier-I./RTE/CMSIS-I./RTE/Device/AMA3B2KK-KBR-I./RTE/_project-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/Core/Include-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/RTOS2/Include-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/RTOS2/RTX/Include-ID:/Keil/ARM/CMSIS/5.9.0/CMSIS/RTOS2/RTX/Include1-ID:/Keil/AmbiqMicro/Apollo_DFP/1.3.0/Device/Include-D__UVISION_VERSION="537" -D_RTE_ -DAPOLLO3P_2048 -D_RTE_-o ./objects/system_apollo3p_1.o -MD)
+I (D:\Keil\ARM\ARMCLANG\include\stdint.h)(0x6252B538)
+I (D:\Keil\AmbiqMicro\Apollo_DFP\1.3.0\Device\Include\system_apollo3.h)(0x62E11730)
+I (D:\Keil\AmbiqMicro\Apollo_DFP\1.3.0\Device\Include\apollo3.h)(0x62F3D036)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\Core\Include\core_cm4.h)(0x626F9F3E)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\Core\Include\cmsis_version.h)(0x626F9F3E)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\Core\Include\cmsis_compiler.h)(0x626F9F3E)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\Core\Include\cmsis_armclang.h)(0x626F9F3E)
+I (D:\Keil\ARM\CMSIS\5.9.0\CMSIS\Core\Include\mpu_armv7.h)(0x626F9F3E)
+F (RTE/Device/AMA3B2KK-KBR/system_apollo3p.h)(0x62E11730)()
