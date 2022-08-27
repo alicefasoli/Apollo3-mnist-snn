@@ -2,7 +2,7 @@
 
 This code is designed to demo the use of a Spiking Neural Network (SNN) on the Apollo3 Blue Plus board. 
 
-The network is learned in an unsupervised way, more specifically using the Spike-Time Dependent Plasticity (STDP) to update the weights of the synapses.
+The network learns in an unsupervised way, more specifically using the Spike-Time Dependent Plasticity (STDP) to update the weights of the synapses.
 The network is trained using the MNIST dataset and achieves an accuracy of 60% with a total of 100 neurons in the second layer.
 
 To test the classification on the microcontroller, we had to give up some accuracy because of memory problems.
