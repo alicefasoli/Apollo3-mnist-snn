@@ -6,38 +6,38 @@
 #include <core_cm4.h>
 
 #include "classify.h"
+#include "time.h"
 
-#define EVB_LED0        10
-#define EVB_LED1        30
-#define EVB_LED2        15
-#define EVB_LED3        14
-#define EVB_LED4        17
+#define EVB_LED0 10
+#define EVB_LED1 30
+#define EVB_LED2 15
+#define EVB_LED3 14
+#define EVB_LED4 17
 
 //
 // Keep the LED pattern array in FLASH instead of SRAM.
 //
 static const uint8_t led_pattern[44] =
-{
-    //
-    // Binary count up
-    //
-      1,  2,  3,  4,  5,  6,  7,  8,  9,  0, 16,
+    {
+        //
+        // Binary count up
+        //
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 16,
 
-    //
-    // Rotote left pattern
-    //
-    0x01, 0x02, 0x04, 0x08, 0x10, 0x01, 0x02, 0x04, 0x08, 0x10, 0x00,
+        //
+        // Rotote left pattern
+        //
+        0x01, 0x02, 0x04, 0x08, 0x10, 0x01, 0x02, 0x04, 0x08, 0x10, 0x00,
 
-    //
-    // Rotate right pattern
-    //
-    0x10, 0x08, 0x04, 0x02, 0x01, 0x10, 0x08, 0x04, 0x02, 0x01, 0x00,
+        //
+        // Rotate right pattern
+        //
+        0x10, 0x08, 0x04, 0x02, 0x01, 0x10, 0x08, 0x04, 0x02, 0x01, 0x00,
 
-    //
-    // Springing pattern
-    //
-    0x15, 0x0A, 0x15, 0x0A, 0x15, 0x0A, 0x15, 0x0A, 0x15, 0x00
-};
+        //
+        // Springing pattern
+        //
+        0x15, 0x0A, 0x15, 0x0A, 0x15, 0x0A, 0x15, 0x0A, 0x15, 0x00};
 
 //*****************************************************************************
 //
@@ -55,11 +55,11 @@ LED_on(uint32_t ui32LED, bool bOn)
 {
     uint32_t ui32Mask;
 
-    if ( ui32LED <= 31 )
+    if (ui32LED <= 31)
     {
         ui32Mask = 0x01 << (ui32LED - 0);
 
-        if ( bOn )
+        if (bOn)
         {
             GPIO->WTSA = ui32Mask;
         }
@@ -68,11 +68,11 @@ LED_on(uint32_t ui32LED, bool bOn)
             GPIO->WTCA = ui32Mask;
         }
     }
-    else if ( ui32LED <= 49 )
+    else if (ui32LED <= 49)
     {
         ui32Mask = 0x01 << (ui32LED - 32);
 
-        if ( bOn )
+        if (bOn)
         {
             GPIO->WTSB = ui32Mask;
         }
@@ -84,7 +84,8 @@ LED_on(uint32_t ui32LED, bool bOn)
     else
     {
         // ERROR.
-        while (1);
+        while (1)
+            ;
     }
 
 } // LED_on()
@@ -116,7 +117,7 @@ padreg_funcsel_set(uint32_t ui32GPIOnum, uint32_t ui32Func)
     // be a byte offset to the PADREG address. Since we have a word ptr, we
     // need to make it a word offset (so divide by 4).
     //
-    pui32Reg   = &(GPIO->PADREGA) + (ui32GPIOnum / 4);
+    pui32Reg = &(GPIO->PADREGA) + (ui32GPIOnum / 4);
 
     //
     // Set the padreg value given by the caller.
@@ -150,8 +151,8 @@ gpio_cfg_set(uint32_t ui32GPIOnum, uint32_t ui32CFG)
     // Configure the GPIO as push pull outputs for use with an LED.
     // Each GPIOCFG configures 8 GPIOs, each divided into nibbles.
     //
-    ui32Shift  = (ui32GPIOnum & 0x7) * 4;
-    pui32Reg   = &(GPIO->CFGA) + (ui32GPIOnum / 8);
+    ui32Shift = (ui32GPIOnum & 0x7) * 4;
+    pui32Reg = &(GPIO->CFGA) + (ui32GPIOnum / 8);
     *pui32Reg &= ~(0xF << ui32Shift);
 
     //
@@ -172,15 +173,15 @@ gpio_cfg_set(uint32_t ui32GPIOnum, uint32_t ui32CFG)
 // Configure a GPIO for use with an LED.
 //
 //*****************************************************************************
-void
-LED_gpio_cfg(uint32_t ui32GPIOnum)
+void LED_gpio_cfg(uint32_t ui32GPIOnum)
 {
-    if ( ui32GPIOnum > 49 )
+    if (ui32GPIOnum > 49)
     {
         //
         // Error
         //
-        while(1);
+        while (1)
+            ;
     }
 
     //
@@ -205,9 +206,9 @@ LED_gpio_cfg(uint32_t ui32GPIOnum)
 
 } // LED_gpio_cfg()
 
-void 
-GPIO_init(){
-		//
+void GPIO_init()
+{
+    //
     // Configure pads for LEDs as GPIO functions.
     //
     //
@@ -225,23 +226,22 @@ GPIO_init(){
     padreg_funcsel_set(41, 2);
 }
 
-void
-setSleepMode (int bSetDeepSleep)
+void setSleepMode(int bSetDeepSleep)
 {
-  if (bSetDeepSleep)
-  {
-    SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
-  }
-  else
-  {
-    SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
-  }
+    if (bSetDeepSleep)
+    {
+        SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
+    }
+    else
+    {
+        SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
+    }
 
 } // setSleepMode()
 
-void
-all(bool flag){
-		//
+void all(bool flag)
+{
+    //
     // Initialize the LEDs to all on.
     //
     LED_on(EVB_LED0, flag);
@@ -253,18 +253,18 @@ all(bool flag){
 #endif // EVB_LED4
 }
 
-void 
-activate(uint32_t value){
-		uint32_t ui32Value;
+void activate(uint32_t value)
+{
+    uint32_t ui32Value;
 
     ui32Value = led_pattern[(value - 1) & 0x0000003F];
 
-    LED_on( EVB_LED0, (bool)(ui32Value & 0x00000001) );
-    LED_on( EVB_LED1, (bool)(ui32Value & 0x00000002) );
-    LED_on( EVB_LED2, (bool)(ui32Value & 0x00000004) );
-    LED_on( EVB_LED3, (bool)(ui32Value & 0x00000008) );
+    LED_on(EVB_LED0, (bool)(ui32Value & 0x00000001));
+    LED_on(EVB_LED1, (bool)(ui32Value & 0x00000002));
+    LED_on(EVB_LED2, (bool)(ui32Value & 0x00000004));
+    LED_on(EVB_LED3, (bool)(ui32Value & 0x00000008));
 #ifdef EVB_LED4
-    LED_on( EVB_LED4, (bool)(ui32Value & 0x00000010) );
+    LED_on(EVB_LED4, (bool)(ui32Value & 0x00000010));
 #endif // EVB_LED4
 }
 
@@ -273,61 +273,69 @@ activate(uint32_t value){
 // Main
 //
 //*****************************************************************************
-int
-main(void)
+int main(void)
 {
-		GPIO_init();
-	
-		int classified_image;
-		classified_image = classify_image();
-	
-		// printf("Classification Done: %d", classified_image);
-	
-		switch(classified_image)
-		{
-			case 0:
-				activate(0); 						// Number 0
-				break;
-			case 1:
-				activate(1); 						// Number 1
-				break;
-			case 2:
-				activate(2); 						// Number 2
-				break;
-			case 3:
-				activate(3);						// Number 3
-				break;
-			case 4:
-				activate(4); 						// Number 4
-				break;
-			case 5:
-				activate(5); 						// Number 5
-				break;
-			case 6:
-				activate(6); 						// Number 6
-				break;
-			case 7:
-				activate(7); 						// Number 7
-				break;
-			case 8:
-				activate(8); 						// Number 8
-				break;
-			case 9:
-				activate(9); 						// Number 9
-				break;
-			case 16:
-				activate(16); 						// Wrong classification
-				break;
-			default:
-				all(true);
-				break;
-		}
-	
-    while(1)
+    GPIO_init();
+
+    clock_t start, end;
+    double time_used;
+
+    start = clock();
+
+    int classified_image;
+    classified_image = classify_image();
+
+    end = clock();
+    time_used = (double)(end - start) / CLOCKS_PER_SEC;
+
+    printf("Time for inference: %lf\n", time_used);
+    printf("Classification Done: %d", classified_image);
+
+    switch (classified_image)
+    {
+    case 0:
+        activate(0); // Number 0
+        break;
+    case 1:
+        activate(1); // Number 1
+        break;
+    case 2:
+        activate(2); // Number 2
+        break;
+    case 3:
+        activate(3); // Number 3
+        break;
+    case 4:
+        activate(4); // Number 4
+        break;
+    case 5:
+        activate(5); // Number 5
+        break;
+    case 6:
+        activate(6); // Number 6
+        break;
+    case 7:
+        activate(7); // Number 7
+        break;
+    case 8:
+        activate(8); // Number 8
+        break;
+    case 9:
+        activate(9); // Number 9
+        break;
+    case 16:
+        activate(16); // Wrong classification
+        break;
+    default:
+        all(true);
+        break;
+    }
+
+    while (1)
     {
         //
         // Sleep here
         //
-        __WFI(); 
-		}
+        __WFI();
+    }
 }
