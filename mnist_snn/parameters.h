@@ -10,9 +10,8 @@
 #include <stdlib.h>
 
 // Simulation parameters
-int t = 350;
+int t = 200;
 int t_back = -5;
-int epoch = 1;
 
 // Input parameters
 double p_rest = -70.0;
