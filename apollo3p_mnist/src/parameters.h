@@ -8,7 +8,7 @@
 #define N_FIRST_LAYER 784
 #define N_SECOND_LAYER 100
 #define PIXEL 28
-#define T 350
+#define T 200
 
 // Simulation parameters
 int t_back = -5;
@@ -22,9 +22,6 @@ double p_th = -55.0;
 double p_hyperpolarization = -90.0;
 double p_drop = 0.8;
 double p_th_drop = 0.4;
-
-double w_min = 0.00001;
-double w_max = 1.0;
 
 // Receptive field parameters
 // Tolerance window
