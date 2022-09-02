@@ -18,6 +18,12 @@
 #define EVB_LED3 14
 #define EVB_LED4 17
 
+static double train[N_FIRST_LAYER * (T + 1)];
+double pot[PIXEL * PIXEL];
+
+int count_spikes[N_SECOND_LAYER];
+double active_pot[N_SECOND_LAYER];
+
 typedef struct
 {
 	double p;
@@ -315,12 +321,6 @@ void activate(uint32_t value)
 #endif // EVB_LED4
 }
 
-static double train[N_FIRST_LAYER * (T + 1)];
-double pot[PIXEL * PIXEL];
-
-int count_spikes[N_SECOND_LAYER];
-double active_pot[N_SECOND_LAYER];
-
 //*****************************************************************************
 //
 // Main
@@ -408,7 +408,6 @@ int main(void)
 
     for (int i = 0; i < N_SECOND_LAYER; i++)
     {
-        // output_layer[i] = initial();
 			active_pot[i] = 0.0;
 			count_spikes[i] = 0;
     }
@@ -433,7 +432,6 @@ int main(void)
 								}
 						}
 						pot[(i * PIXEL) + j] = sum;
-						// printf("%lf ", pot[(i * PIXEL) + j]);
 
 						if (min > pot[(i * PIXEL) + j])
 						{
@@ -445,10 +443,7 @@ int main(void)
 								max = pot[(i * PIXEL) + j];
 						}
 				}
-				// printf("\n");
 		}
-		// printf("Min pot : %2.1f\n", min);
-		// printf("Max pot : %2.1f\n", max);
 
 		// Spike train encoding
 		double xp[2];
@@ -576,7 +571,6 @@ int main(void)
 			return_value = 16;
 		}
 		
-		// return_value = classify();
 	
     switch (return_value)
     {

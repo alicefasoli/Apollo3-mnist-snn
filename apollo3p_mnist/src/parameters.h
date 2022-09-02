@@ -25,12 +25,6 @@ double p_th_drop = 0.4;
 double w_min = 0.00001;
 double w_max = 1.0;
 
-// STDP parameters
-double sigma = 0.01; // learning rate
-double A = 0.8;
-double tau = 5.0;
-double mu = 0.9;
-
 // Receptive field parameters
 // Tolerance window
 double w[5][5] = {{-0.5, -0.125, 0.125, -0.125, -0.5},
