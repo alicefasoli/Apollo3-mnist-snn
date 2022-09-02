@@ -75,7 +75,7 @@ classify_image(){
 						{
 								for (n = 0; n < 5; n++)
 								{
-										if ((i + (double)ran[m]) >= 0 && (i + (double)ran[m]) <= (PIXEL - 1) && (j + (double)ran[n]) >= 0 && (j + (double)ran[n]) <= (PIXEL - 1))
+										if ((i + ran[m]) >= 0 && (i + ran[m]) <= (PIXEL - 1) && (j + ran[n]) >= 0 && (j + ran[n]) <= (PIXEL - 1))
 										{
 												sum = sum + w[ox + ran[m]][oy + ran[n]] * (actual_img[i + ran[m]][j + ran[n]] / 255.0);
 										}

@@ -5,14 +5,60 @@
 #include "apollo3p.h"
 #include <core_cm4.h>
 
-#include "classify.h"
-#include "time.h"
+#include "parameters.h"
+
+#include "actual_image.h"
+#include "network_values.h"
+
+#include "math.h"
 
 #define EVB_LED0 10
 #define EVB_LED1 30
 #define EVB_LED2 15
 #define EVB_LED3 14
 #define EVB_LED4 17
+
+typedef struct
+{
+	double p;
+	double p_th;
+
+	int t_rest;
+	int t_ref;
+} Neuron;
+
+double interp(double x, double xp[2], double fp[2])
+{
+    double x_interpoled;
+
+    double yi = fp[0] + ((x - xp[0]) / (xp[1] - xp[0])) * (fp[1] - fp[0]);
+    if (yi < fp[0])
+    {
+        x_interpoled = fp[0];
+    }
+    else if (yi > fp[1])
+    {
+        x_interpoled = fp[1];
+    }
+    else
+    {
+        x_interpoled = yi;
+    }
+
+    return x_interpoled;
+}
+
+void hyperpolarization(Neuron *n, int _t)
+{
+    n->p = p_hyperpolarization;
+    n->t_rest = _t + n->t_ref;
+}
+
+void inhibit(Neuron *n, int _t)
+{
+    n->p = p_inhibit;
+    n->t_rest = _t + n->t_ref;
+}
 
 //
 // Keep the LED pattern array in FLASH instead of SRAM.
@@ -22,7 +68,7 @@ static const uint8_t led_pattern[44] =
         //
         // Binary count up
         //
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 16,
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 16,
 
         //
         // Rotote left pattern
@@ -37,8 +83,9 @@ static const uint8_t led_pattern[44] =
         //
         // Springing pattern
         //
-        0x15, 0x0A, 0x15, 0x0A, 0x15, 0x0A, 0x15, 0x0A, 0x15, 0x00};
-
+        0x15, 0x0A, 0x15, 0x0A, 0x15, 0x0A, 0x15, 0x0A, 0x15, 0x00
+		};
+		
 //*****************************************************************************
 //
 // Set or clear an LED.
@@ -226,7 +273,7 @@ void GPIO_init()
     padreg_funcsel_set(41, 2);
 }
 
-void setSleepMode(int bSetDeepSleep)
+void setSleepMode(uint32_t bSetDeepSleep)
 {
     if (bSetDeepSleep)
     {
@@ -268,6 +315,12 @@ void activate(uint32_t value)
 #endif // EVB_LED4
 }
 
+static double train[N_FIRST_LAYER * (T + 1)];
+double pot[PIXEL * PIXEL];
+
+int count_spikes[N_SECOND_LAYER];
+double active_pot[N_SECOND_LAYER];
+
 //*****************************************************************************
 //
 // Main
@@ -276,25 +329,259 @@ void activate(uint32_t value)
 int main(void)
 {
     GPIO_init();
+		int i, j, k, m, n, tm;
 
-    clock_t start, end;
-    double time_used;
+    // Initialize matrix
+		int return_value;
 
-    start = clock();
+		Neuron neu0;
+		neu0.p = p_rest;
+		neu0.p_th = p_th;
+		neu0.t_rest = -1;
+		neu0.t_ref = 15;
 
-    int classified_image;
-    classified_image = classify_image();
+		Neuron neu1;
+		neu1.p = p_rest;
+		neu1.p_th = p_th;
+		neu1.t_rest = -1;
+		neu1.t_ref = 15;
 
-    end = clock();
-    time_used = (double)(end - start) / CLOCKS_PER_SEC;
+		Neuron neu2;
+		neu2.p = p_rest;
+		neu2.p_th = p_th;
+		neu2.t_rest = -1;
+		neu2.t_ref = 15;
 
-    printf("Time for inference: %lf\n", time_used);
-    printf("Classification Done: %d", classified_image);
+		Neuron neu3;
+		neu3.p = p_rest;
+		neu3.p_th = p_th;
+		neu3.t_rest = -1;
+		neu3.t_ref = 15;
 
-    switch (classified_image)
+		Neuron neu4;
+		neu4.p = p_rest;
+		neu4.p_th = p_th;
+		neu4.t_rest = -1;
+		neu4.t_ref = 15;
+
+		Neuron neu5;
+		neu5.p = p_rest;
+		neu5.p_th = p_th;
+		neu5.t_rest = -1;
+		neu5.t_ref = 15;
+
+		Neuron neu6;
+		neu6.p = p_rest;
+		neu6.p_th = p_th;
+		neu6.t_rest = -1;
+		neu6.t_ref = 15;
+
+		Neuron neu7;
+		neu7.p = p_rest;
+		neu7.p_th = p_th;
+		neu7.t_rest = -1;
+		neu7.t_ref = 15;
+
+		Neuron neu8;
+		neu8.p = p_rest;
+		neu8.p_th = p_th;
+		neu8.t_rest = -1;
+		neu8.t_ref = 15;
+
+		Neuron neu9;
+		neu9.p = p_rest;
+		neu9.p_th = p_th;
+		neu9.t_rest = -1;
+		neu9.t_ref = 15;
+		
+		Neuron *output_layer[10]; // Creating hidden layer of neurons
+		output_layer[0] = &neu0;
+		output_layer[1] = &neu1;
+		output_layer[2] = &neu2;
+		output_layer[3] = &neu3;
+		output_layer[4] = &neu4;
+		output_layer[5] = &neu5;
+		output_layer[6] = &neu6;
+		output_layer[7] = &neu7;
+		output_layer[8] = &neu8;
+		output_layer[9] = &neu9;
+
+    for (int i = 0; i < N_SECOND_LAYER; i++)
+    {
+        // output_layer[i] = initial();
+			active_pot[i] = 0.0;
+			count_spikes[i] = 0;
+    }
+
+		// Receptive field convolution
+		double min = 0.0;
+		double max = -10000.0;
+		double sum;
+		for (i = 0; i < PIXEL; i++) // loop for receptive field convolution
+		{
+				for (j = 0; j < PIXEL; j++)
+				{
+						sum = 0.0;
+						for (m = 0; m < 5; m++)
+						{
+								for (n = 0; n < 5; n++)
+								{
+										if ((i + (double)ran[m]) >= 0 && (i + (double)ran[m]) <= (PIXEL - 1) && (j + (double)ran[n]) >= 0 && (j + (double)ran[n]) <= (PIXEL - 1))
+										{
+												sum = sum + w[ox + ran[m]][oy + ran[n]] * (actual_img[i + ran[m]][j + ran[n]] / 255.0);
+										}
+								}
+						}
+						pot[(i * PIXEL) + j] = sum;
+						// printf("%lf ", pot[(i * PIXEL) + j]);
+
+						if (min > pot[(i * PIXEL) + j])
+						{
+								min = pot[(i * PIXEL) + j];
+						}
+
+						if (max < pot[(i * PIXEL) + j])
+						{
+								max = pot[(i * PIXEL) + j];
+						}
+				}
+				// printf("\n");
+		}
+		// printf("Min pot : %2.1f\n", min);
+		// printf("Max pot : %2.1f\n", max);
+
+		// Spike train encoding
+		double xp[2];
+		double fp[2] = {1.0, 50.0};
+		double freq, time_period, time_of_spike;
+		for (i = 0; i < N_FIRST_LAYER; i++) // loop for potential list
+		{
+				xp[0] = min;
+				xp[1] = max;
+				freq = interp(pot[i], xp, fp);
+
+				time_period = ceil(100.0 / freq);
+
+				time_of_spike = time_period;
+
+				for (j = 0; j < (t + 1); j++)
+				{
+						train[(i * (t + 1)) + j] = 0.0;
+				}
+
+				if (pot[i] > 0)
+				{
+						while (time_of_spike < t + 1)
+						{
+								train[(i * (t + 1)) + (int)time_of_spike] = 1.0;
+								time_of_spike = time_of_spike + time_period;
+						}
+				}
+		}
+
+		int winner = 0;
+		double dotProduct, argmax_active;
+		for (tm = 0; tm < (t + 1); tm++)
+		{
+				for (i = 0; i < N_SECOND_LAYER; i++)
+				{
+						if (output_layer[i]->t_rest < tm)
+						{
+								dotProduct = 0.0;
+								for (j = 0; j < N_FIRST_LAYER; j++)
+								{
+										dotProduct = dotProduct + (synapse[(i * N_FIRST_LAYER) + j] * train[(j * (t + 1)) + tm]);
+								}
+
+								output_layer[i]->p = output_layer[i]->p + dotProduct;
+
+								if (output_layer[i]->p > p_rest)
+								{
+										output_layer[i]->p = output_layer[i]->p - p_drop;
+								}
+						}
+						active_pot[i] = output_layer[i]->p;
+				}
+
+				argmax_active = active_pot[0];
+				for (j = 0; j < N_SECOND_LAYER; j++)
+				{
+						if (argmax_active < active_pot[j])
+						{
+								argmax_active = active_pot[j];
+								winner = j;
+						}
+				}
+
+				for (i = 0; i < N_SECOND_LAYER; i++)
+				{
+						if (i == winner && active_pot[i] > output_layer[i]->p_th)
+						{
+								hyperpolarization(output_layer[i], tm);
+								output_layer[i]->p_th = output_layer[i]->p_th - 1.0;
+								count_spikes[i] = count_spikes[i] + 1;
+
+								for (k = 0; k < N_SECOND_LAYER; k++)
+								{
+										if (k != winner)
+										{
+												if (output_layer[k]->p > output_layer[k]->p_th)
+												{
+														count_spikes[k] = count_spikes[k] + 1;
+												}
+												inhibit(output_layer[k], tm);
+										}
+								}
+								break;
+						}
+				}
+		}
+
+		int argmax_count = count_spikes[0];
+		int learning_neuron = 0;
+		for (i = 0; i < N_SECOND_LAYER; i++)
+		{
+				if (argmax_count < count_spikes[i])
+				{
+						argmax_count = count_spikes[i];
+						learning_neuron = i;
+				}
+		}
+        
+		int predicted_label = neuron_labels[learning_neuron];
+		
+		if(actual_label == predicted_label){
+			if(predicted_label == 0){
+				return_value = 0;
+			}else if(predicted_label == 1){
+				return_value = 1;
+			}else if(predicted_label == 2){
+				return_value = 2;
+			}else if(predicted_label == 3){
+				return_value = 3;
+			}else if(predicted_label == 4){
+				return_value = 4;
+			}else if(predicted_label == 5){
+				return_value = 5;
+			}else if(predicted_label == 6){
+				return_value = 6;
+			}else if(predicted_label == 7){
+				return_value = 7;
+			}else if(predicted_label == 8){
+				return_value = 8;
+			}else if(predicted_label == 9){
+				return_value = 9;
+			}
+		}else{
+			return_value = 16;
+		}
+		
+		// return_value = classify();
+	
+    switch (return_value)
     {
     case 0:
-        activate(0); // Number 0
+        activate(10); // Number 0
         break;
     case 1:
         activate(1); // Number 1
@@ -330,12 +617,13 @@ int main(void)
         all(true);
         break;
     }
-
-    while (1)
+		
+		while (1)
     {
         //
         // Sleep here
         //
         __WFI();
     }
+		
 }
