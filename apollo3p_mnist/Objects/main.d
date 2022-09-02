@@ -8,5 +8,5 @@
   D:\Keil\ARM\CMSIS\5.9.0\CMSIS\Core\Include\cmsis_armclang.h \
   D:\Keil\ARM\CMSIS\5.9.0\CMSIS\Core\Include\mpu_armv7.h \
   D:\Keil\AmbiqMicro\Apollo_DFP\1.3.0\Device\Include\system_apollo3p.h \
-  src\classify.h src\network_values.h src\parameters.h \
-  src\actual_image.h D:\Keil\ARM\ARMCLANG\Bin\..\include\math.h
+  src\parameters.h src\actual_image.h src\network_values.h \
+  D:\Keil\ARM\ARMCLANG\Bin\..\include\math.h

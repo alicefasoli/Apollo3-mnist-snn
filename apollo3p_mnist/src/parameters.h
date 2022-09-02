@@ -1,16 +1,15 @@
 #ifndef __PARAMETERS_H__
 #define __PARAMETERS_H__
 
-/*
-    This file contains all the parameters of the network
-*/
-
 #define N_FIRST_LAYER 784
-#define N_SECOND_LAYER 100
+#define N_SECOND_LAYER 10
 #define PIXEL 28
-#define T 200
+#define FOTO 10
+
+#define T 100
 
 // Simulation parameters
+int t = 100;
 int t_back = -5;
 
 // Input parameters
@@ -22,6 +21,15 @@ double p_th = -55.0;
 double p_hyperpolarization = -90.0;
 double p_drop = 0.8;
 double p_th_drop = 0.4;
+
+double w_min = 0.00001;
+double w_max = 1.0;
+
+// STDP parameters
+double sigma = 0.01; // learning rate
+double A = 0.8;
+double tau = 5.0;
+double mu = 0.9;
 
 // Receptive field parameters
 // Tolerance window
